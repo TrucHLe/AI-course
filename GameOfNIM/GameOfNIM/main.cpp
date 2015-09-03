@@ -16,9 +16,9 @@ using namespace std;
 
 
 
-//-------------------------------------------
+//===----------------------------------------------------------------------===//
 // Print instruction
-//
+//===----------------------------------------------------------------------===//
 void printInstruction( array<int, 3> valid_moves )
 {
     cout << "---------- Game of NIM ----------" << endl;
@@ -39,9 +39,9 @@ void printInstruction( array<int, 3> valid_moves )
 
 
 
-//-------------------------------------------
-// Return the number of sticks that computer takes
-//
+//===----------------------------------------------------------------------===//
+// Compute Move
+//===----------------------------------------------------------------------===//
 int computeMove( int available_sticks, array<int, 3> valid_moves )
 {
     
@@ -134,9 +134,9 @@ int computeMove( int available_sticks, array<int, 3> valid_moves )
 
 
 
-//-------------------------------------------
+//===----------------------------------------------------------------------===//
 // Validify the number of sticks that user takes
-//
+//===----------------------------------------------------------------------===//
 int validifyMove( int available_sticks, array<int, 3> valid_moves, int sticks_user_takes )
 {
     while ( ( find( begin(valid_moves), end(valid_moves), sticks_user_takes ) == end(valid_moves) )
@@ -154,9 +154,10 @@ int validifyMove( int available_sticks, array<int, 3> valid_moves, int sticks_us
 }
 
 
-//-------------------------------------------
+
+//===----------------------------------------------------------------------===//
 // Main
-//
+//===----------------------------------------------------------------------===//
 int main(int argc, const char * argv[])
 {
     
