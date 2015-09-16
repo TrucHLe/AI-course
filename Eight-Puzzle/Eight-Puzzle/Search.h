@@ -10,19 +10,8 @@
 #define __Eight_Puzzle__Search__
 
 #include <stdio.h>
-#include <fstream>      // ifstream
-
-using namespace std;
 
 
 
-class Search
-{
-private:
-    ifstream& inputFile;
-    
-public:
-    Search( ifstream& i );
-};
 
 #endif /* defined(__Eight_Puzzle__Search__) */

@@ -10,5 +10,20 @@
 #define __Eight_Puzzle__State__
 
 #include <stdio.h>
+#include <fstream>  // ifstream
+
+using namespace std;
+
+
+class State
+{
+    
+private:
+    int grid[3][3];
+    
+public:
+    State( ifstream& i );
+    
+};
 
 #endif /* defined(__Eight_Puzzle__State__) */
