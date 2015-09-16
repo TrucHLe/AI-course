@@ -18,7 +18,7 @@ using namespace std;
 //
 State::State( int g[3][3] )
 {
-    for ( int i : { 0, 1, 2 } ) // Use loops since C++ arrays aren't assignable
+    for ( int i : { 0, 1, 2 } )
         for ( int j : { 0, 1, 2 } )
         {
             grid[i][j] = g[i][j];
