@@ -57,7 +57,6 @@ ifstream getFile()
 //===----------------------------------------------------------------------===//
 // Get current character
 //===----------------------------------------------------------------------===//
-
 char getCurrentCharacter( int column_number, string current_line, ifstream& input_file )
 {
     if ( column_number <= current_line.size() )
@@ -83,7 +82,6 @@ char getCurrentCharacter( int column_number, string current_line, ifstream& inpu
 //===----------------------------------------------------------------------===//
 // Advance to the next character
 //===----------------------------------------------------------------------===//
-
 void advance( int& column_number, int& line_number, string& current_line, ifstream& input_file )
 {
     if ( column_number <= current_line.size() )
@@ -101,7 +99,6 @@ void advance( int& column_number, int& line_number, string& current_line, ifstre
     }
     
     else {} // At EOF, do nothing
-
 }
 
 //
@@ -140,24 +137,35 @@ void checkAndGetGrid( ifstream& input_file, int grid[3][3] ) // don't know why g
             cout << "(!) Invalid eight-puzzle." << endl;
             exit( 1 );
         }
+        
         else if ( isdigit( current_character ) )
         {
             int grid_row    = line_number - 1;
             int grid_column = digit_counter % 3;
             
-            grid[ grid_row ][ grid_column ] = current_character - 48;
+            grid[ grid_row ][ grid_column ] = current_character - 48; //-48 to convert from ASCII to int
             
             ++digit_counter;
         }
         
         advance( column_number, line_number, current_line, input_file);
+    }
+    
+    
+    cout << endl;
+    cout << "-- Puzzle --" << endl;
+    for ( int i = 0; i < 3; ++i )
+    {
+        for ( int j = 0; j < 3; ++j )
+        {
+            cout << grid[i][j] << "     ";
+        }
         
+        cout << endl;
     }
 
-    
-    
-    
 }
+
 //
 // !Check and get grid
 //===----------------------------------------------------------------------===//
@@ -184,7 +192,14 @@ int getAlgorithmNumber()
     cout << "$ ";
     
     
-    cin >> algorithm_number;
+    
+    while ( !( cin >> algorithm_number ) ) // this calls and checks cin respectively
+    {
+        cin.clear();
+        cin.ignore( numeric_limits<streamsize>::max(), '\n' );
+        cout << "(!) Invalid algorithm number, try again." << endl;
+        cout << "Algorithm Number: ";
+    }
     
     while ( algorithm_number < 1 || algorithm_number > 5 )
     {
@@ -197,6 +212,7 @@ int getAlgorithmNumber()
     return algorithm_number;
     
 }
+
 //
 // !Get algorithm number
 //===----------------------------------------------------------------------===//
@@ -223,17 +239,7 @@ int main(int argc, const char * argv[])
     
     checkAndGetGrid( input_file, grid );
     
-    cout << endl;
-    cout << "-- Puzzle --" << endl;
-    for ( int i = 0; i < 3; ++i )
-    {
-        for ( int j = 0; j < 3; ++j )
-        {
-            cout << grid[i][j] << "     ";
-        }
-        cout << endl;
-        
-    }
+
     
     
     algorithm_number = getAlgorithmNumber();
