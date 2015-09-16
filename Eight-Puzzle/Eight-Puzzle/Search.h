@@ -13,5 +13,4 @@
 
 
 
-
 #endif /* defined(__Eight_Puzzle__Search__) */

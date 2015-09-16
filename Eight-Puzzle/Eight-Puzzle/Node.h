@@ -16,34 +16,6 @@
 class Node
 {
     
-private:
-    int value;
-    Node* up;
-    Node* down;
-    Node* left;
-    Node* right;
-    
-    
-    
-public:
-    Node();
-    
-    void setValue( int v );
-    void setUp( Node* u );
-    void setDown( Node* d );
-    void setLeft( Node* l );
-    void setRight( Node* r );
-    
-    int getValue();
-    Node* getUp();
-    Node* getDown();
-    Node* getLeft();
-    Node* getRight();
-    
-    bool hasUp();
-    bool hasDown();
-    bool hasLeft();
-    bool hasRight();
     
 };
 

@@ -10,6 +10,7 @@
 		4DEBB0BA1BA9126E0072C50C /* State.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBB0B81BA9126E0072C50C /* State.cpp */; };
 		4DEBB0BD1BA912780072C50C /* Search.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBB0BB1BA912780072C50C /* Search.cpp */; };
 		4DEBB0C01BA912810072C50C /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBB0BE1BA912810072C50C /* Node.cpp */; };
+		4DEBB0C21BAA27350072C50C /* FileManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBB0C11BAA27350072C50C /* FileManager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,6 +33,7 @@
 		4DEBB0BC1BA912780072C50C /* Search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Search.h; sourceTree = "<group>"; };
 		4DEBB0BE1BA912810072C50C /* Node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Node.cpp; sourceTree = "<group>"; };
 		4DEBB0BF1BA912810072C50C /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
+		4DEBB0C11BAA27350072C50C /* FileManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileManager.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				4DEBB0B91BA9126E0072C50C /* State.h */,
 				4DEBB0BE1BA912810072C50C /* Node.cpp */,
 				4DEBB0BF1BA912810072C50C /* Node.h */,
+				4DEBB0C11BAA27350072C50C /* FileManager.cpp */,
 			);
 			path = "Eight-Puzzle";
 			sourceTree = "<group>";
@@ -133,6 +136,7 @@
 				4DEBB0BD1BA912780072C50C /* Search.cpp in Sources */,
 				4DEBB0BA1BA9126E0072C50C /* State.cpp in Sources */,
 				4DEBB0C01BA912810072C50C /* Node.cpp in Sources */,
+				4DEBB0C21BAA27350072C50C /* FileManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

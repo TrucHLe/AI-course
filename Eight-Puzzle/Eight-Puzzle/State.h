@@ -10,9 +10,13 @@
 #define __Eight_Puzzle__State__
 
 #include <stdio.h>
-#include <fstream>  // ifstream
+#include <stdlib.h> // abs
+#include <tuple>    // pair<T, T>
 
 using namespace std;
+
+
+enum Directions { Up, Down, Left, Right };
 
 
 class State
@@ -20,9 +24,19 @@ class State
     
 private:
     int grid[3][3];
+    pair<int, int> blank_tile;
+    
     
 public:
-    State( ifstream& i );
+    State( int g[3][3] ); //init State and find the blank tile
+    
+    bool isGoal();
+    bool blankCanMove( Directions direction );
+    void moveBlank( Directions direction );
+    
+    pair<int, int> tilePosition( int tileValue );
+    int distance( pair<int, int> tile1, pair<int, int> tile2 );
+    int ManhattanDistance();
     
 };
 
