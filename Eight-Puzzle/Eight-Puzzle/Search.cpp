@@ -31,14 +31,15 @@ bool IDS( Node node );
 bool BeFS( Node node );
 bool AS( Node node );
 void printNode( Node* node, string gridName, int distance, int isDebuggingNode );
-void printSolution( Node node );
+void printBrFSsolution( Node node, int nodesExpanded );
+void printASsolution( Node node, vector<Node> parents, int nodesExpanded );
 
 
 
 //---------------------------------------------
 // Debugging tools
 //
-bool print_debug_grid = true;
+bool print_debug_grid = false;
 
 
 
@@ -72,33 +73,38 @@ int main(int argc, const char * argv[])
     
     
     State state( grid );
-    Node node( state, NULL ) ;
+    Node node( state, NULL )  ;
   
-    //AS( node );
-    BrFS( node );
 
-//    switch ( algorithm_number )
-//    {
-//        case 1:
-//            if ( BrFS( node ) )
-//            {
-//                time = clock() - time;
-//                cout << "Time completing Breadth-First Search: " << ( double ) time / CLOCKS_PER_SEC << " seconds"<< endl;
-//            }
-//            break;
-//            
-//        
-//        case 5:
-//            if ( AS( node ) )
-//            {
-//                time = clock() - time;
-//                cout << "Time completing A* Search: " << ( double ) time / CLOCKS_PER_SEC << " seconds"<< endl;
-//            }
-//            break;
-//            
-//        default:
-//            break;
-//    }
+
+    switch ( algorithm_number )
+    {
+        case 1:
+            cout << endl;
+            printNode( &node, "Puzzle", -1, 0 );
+            
+            if ( BrFS( node ) )
+            {
+                time = clock() - time;
+                cout << "Breadth-First Search time: " << ( double ) time / CLOCKS_PER_SEC << " seconds"<< endl;
+            }
+            break;
+            
+        
+        case 2:
+            cout << endl;
+            printNode( &node, "Puzzle", -1, 0 );
+            
+            if ( AS( node ) )
+            {
+                time = clock() - time;
+                cout << "A* Search time: " << ( double ) time / CLOCKS_PER_SEC << " seconds"<< endl;
+            }
+            break;
+            
+        default:
+            break;
+    }
     
     
     return 0;
@@ -133,6 +139,7 @@ bool AS( Node node )
     Node* current_node;
     vector<Node> parent_nodes;  // store parent nodes since priority queue rearrange
     int parent_node_index;      // nodes' order, making it hard to track where the parent is
+    int nodes_expanded = 0;
     
     current_node    = &node;
     current_state   = current_node->state;
@@ -154,29 +161,16 @@ bool AS( Node node )
         
         if ( current_state.canMove( Up ) && current_state.previousMove() != Down )
         {
-            Node n = Node( State( current_state, Up ), &parent_nodes.at( parent_node_index ) );
+            Node n = Node( State( current_state, Up ), &parent_nodes.at( parent_node_index ), parent_node_index );
             AS_queue.push( n );
+            ++nodes_expanded;
             
-            
-            
-            cout << "----------" << endl;
-
             
             printNode( &n, "Up", n.state.manhattan_distance, 1 );
             
-            
-            printNode( n.parent, "Up's Parent", -5, 1 );
-//            Node t;
-//            t = AS_queue.top();
-//            printNode( &t, "Up's Top", -1, 1 );
-            cout << "----------" << endl;
-
-            
-            
-            
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printASsolution( n, parent_nodes, nodes_expanded );
                 return true;
             }
 
@@ -185,43 +179,16 @@ bool AS( Node node )
         
         if ( current_state.canMove( Down ) && current_state.previousMove() != Up )
         {
-            Node n = Node( State( current_state, Down ), &parent_nodes.at( parent_node_index ) );
+            Node n = Node( State( current_state, Down ), &parent_nodes.at( parent_node_index ), parent_node_index );
             AS_queue.push( n );
-            
-    
-            
-            cout << "----------" << endl;
+            ++nodes_expanded;
             
     
             printNode( &n, "Down", n.state.manhattan_distance, 1 );
             
-            
-            printNode( n.parent, "Down's Parent", -5, 1 );
-            //            Node t;
-            //            t = AS_queue.top();
-            //            printNode( &t, "Down's Top", -1, 1 );
-            cout << "----------" << endl;
-            
-            
-            
-            
-            if ( AS_queue.size() > 1 )
-            {
-                cout << "Down's Parent F2" << endl;
-                for ( int i : { 0, 1, 2 } )
-                {
-                    for ( int j : { 0, 1, 2 } )
-                        cout << n.parent->parent->state.grid[i][j] << " ";
-                    cout << endl;
-                }
-                cout << endl;
-            }
-            
-
-            
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printASsolution( n, parent_nodes, nodes_expanded );
                 return true;
             }
         }
@@ -229,29 +196,16 @@ bool AS( Node node )
         
         if ( current_state.canMove( Left ) && current_state.previousMove() != Right )
         {
-            Node n = Node( State( current_state, Left ), &parent_nodes.at( parent_node_index ) );
+            Node n = Node( State( current_state, Left ), &parent_nodes.at( parent_node_index ), parent_node_index );
             AS_queue.push( n );
+            ++nodes_expanded;
             
-            
-            
-            
-            cout << "----------" << endl;
-            
-            
+
             printNode( &n, "Left", n.state.manhattan_distance, 1 );
-            
-            
-            printNode( n.parent, "Left's Parent", -5, 1 );
-            //            Node t;
-            //            t = AS_queue.top();
-            //            printNode( &t, "Left's Top", -1, 1 );
-            cout << "----------" << endl;
-            
-            
             
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printASsolution( n, parent_nodes, nodes_expanded );
                 return true;
             }
             
@@ -260,41 +214,20 @@ bool AS( Node node )
         
         if ( current_state.canMove( Right ) && current_state.previousMove() != Left )
         {
-            Node n = Node( State( current_state, Right ), &parent_nodes.at( parent_node_index ) );
+            Node n = Node( State( current_state, Right ), &parent_nodes.at( parent_node_index ), parent_node_index );
             AS_queue.push( n );
-            
-            
-            
-            
-            cout << "----------" << endl;
-            
-            
-            printNode( &n, "Right", n.state.manhattan_distance, 1 );
-            
-            
-            printNode( n.parent, "Right's Parent", -5, 1 );
-            //            Node t;
-            //            t = AS_queue.top();
-            //            printNode( &t, "Right's Top", -1, 1 );
-            cout << "----------" << endl;
-            
-            
+            ++nodes_expanded;
             
 
+            printNode( &n, "Right", n.state.manhattan_distance, 1 );
             
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printASsolution( n, parent_nodes, nodes_expanded );
                 return true;
             }
 
         }
-        
-        // Debugging
-        Node t;
-        t = AS_queue.top();
-        printNode( &t, "Top after expansion", -1, 1 );
-        // !Debugging
 
         
         
@@ -310,12 +243,12 @@ bool AS( Node node )
         
         
         
-        
-         // Debugging
-         cout << "-------------------------" << parent_nodes.size() << endl;
-         cout << endl;
-         // !Debugging
-        
+        /*
+        // Debugging
+        cout << "-------------------------" << parent_nodes.size() << endl;
+        cout << endl;
+        // !Debugging
+        */
     }
     
     
@@ -329,6 +262,81 @@ bool AS( Node node )
 
 
 //===----------------------------------------------------------------------===//
+// Print A* search solution by matching current node's parent index
+// to AS_queue. Didn't use pointers like printBrFSsolution because
+// the typedef ASqueue is constant and doesn't allow access to a node's parent
+//
+void printASsolution( Node node, vector<Node> parents, int nodesExpanded )
+{
+    vector<Node> AS_queue;
+    vector<Directions> directions;
+    stack<string> solution;
+    int steps;
+    Node current_parent_node;
+    int current_parent_index;
+
+    
+    
+    AS_queue = parents;
+    directions.push_back( node.state.previous_move );
+    current_parent_index = node.parent_AS_queue_index;
+    
+    
+    while ( current_parent_index != 0 )
+    {
+        current_parent_node = AS_queue.at( current_parent_index );
+        directions.push_back( current_parent_node.state.previous_move );
+        current_parent_index = current_parent_node.parent_AS_queue_index;
+    }
+    
+    
+    for ( Directions direction : directions )
+    {
+        switch ( direction ) {
+            case Up:
+                solution.push( "Up " );
+                break;
+                
+            case Down:
+                solution.push( "Down " );
+                break;
+                
+            case Left:
+                solution.push( "Left " );
+                break;
+                
+            case Right:
+                solution.push( "Right " );
+                break;
+                
+            case None:
+                break;
+                
+        }
+    }
+    
+    steps = ( int ) solution.size();
+    
+    
+    cout << "Solution: ";
+    while ( !solution.empty() )
+    {
+        cout << solution.top();
+        solution.pop();
+    }
+    cout << endl;
+    cout << "Steps: " << steps << endl;
+    cout << "Nodes expanded: " << nodesExpanded << endl;
+    
+}
+
+//
+// !printASsolution
+//===---------------------------------------===//
+
+
+
+//===----------------------------------------------------------------------===//
 // Breadth-First Search
 //
 bool BrFS( Node node )
@@ -336,6 +344,7 @@ bool BrFS( Node node )
     queue<Node> BFS_queue;
     State current_state;
     Node* current_node;
+    int nodes_expanded = 0;
     
     current_node    = &node; //point current node to node's value
     current_state   = current_node->state;
@@ -354,13 +363,14 @@ bool BrFS( Node node )
         {
             Node n = Node( State( current_state, Up ), current_node );
             BFS_queue.push( n );
+            ++nodes_expanded;
             
             printNode( &n, "Up", -1, 1 );
             
             
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printBrFSsolution( n, nodes_expanded );
                 return true;
             }
         }
@@ -370,13 +380,14 @@ bool BrFS( Node node )
         {
             Node n = Node( State( current_state, Down ), current_node );
             BFS_queue.push( n );
-
+            ++nodes_expanded;
+            
             printNode( &n, "Down", -1, 1 );
             
             
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printBrFSsolution( n, nodes_expanded );
                 return true;
             }
 
@@ -387,13 +398,14 @@ bool BrFS( Node node )
         {
             Node n = Node( State( current_state, Left ), current_node );
             BFS_queue.push( n );
+            ++nodes_expanded;
 
             printNode( &n, "Left", -1, 1 );
 
             
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printBrFSsolution( n, nodes_expanded );
                 return true;
             }
 
@@ -404,13 +416,14 @@ bool BrFS( Node node )
         {
             Node n = Node( State( current_state, Right ), current_node );
             BFS_queue.push( n );
+            ++nodes_expanded;
 
             printNode( &n, "Up", -1, 1 );
 
             
             if ( n.state.isGoal() )
             {
-                printSolution( n );
+                printBrFSsolution( n, nodes_expanded );
                 return true;
             }
 
@@ -441,12 +454,13 @@ bool BrFS( Node node )
 
 
 //===----------------------------------------------------------------------===//
-// Print solution
+// Print breadth-first search solution
 //
-void printSolution( Node node )
+void printBrFSsolution( Node node, int nodesExpanded )
 {
     vector<Directions> directions;
     stack<string> solution;
+    int steps;
     Node* current_node;
 
     current_node = &node;
@@ -455,7 +469,7 @@ void printSolution( Node node )
     while ( current_node->parent )
     {
         printNode( current_node, "Current", -1, 1 );
-        directions.push_back( current_node->state.previousMove() );
+        directions.push_back( current_node->state.previous_move );
         current_node = current_node->parent;
     }
 
@@ -463,7 +477,8 @@ void printSolution( Node node )
     
     for ( Directions direction : directions )
     {
-        switch ( direction ) {
+        switch ( direction )
+        {
             case Up:
                 solution.push( "Up " );
                 break;
@@ -486,11 +501,7 @@ void printSolution( Node node )
         }
     }
     
-    
-    cout << endl;
-    printNode( current_node, "Puzzle", -1, 0 ); // at this time, current_node is
-                                                // pointing at the original puzzle
-                                                // since solution reads backwards
+    steps = ( int ) solution.size();
     
     
     cout << "Solution: ";
@@ -500,17 +511,19 @@ void printSolution( Node node )
         solution.pop();
     }
     cout << endl;
+    cout << "Steps: " << steps << endl;
+    cout << "Nodes expanded: " << nodesExpanded << endl;
     
 }
 
 //
-// !printSolution
+// !printBrFSsolution
 //===---------------------------------------===//
 
 
 
 //===----------------------------------------------------------------------===//
-// Print grid
+// Print node
 //
 void printNode( Node* node, string gridName, int distance, int isDebuggingNode )
 {
@@ -519,7 +532,7 @@ void printNode( Node* node, string gridName, int distance, int isDebuggingNode )
     {
         if ( print_debug_grid )
         {
-            cout << gridName << " --- " << distance << endl;
+            cout << gridName << endl;
             for ( int i = 0; i < 3; ++i )
             {
                 for ( int j = 0; j < 3; ++j )
@@ -531,7 +544,7 @@ void printNode( Node* node, string gridName, int distance, int isDebuggingNode )
     }
     else if ( isDebuggingNode == 0 )
     {
-        cout << gridName << " --- " << distance << endl;
+        cout << gridName << endl; //<< " --- " << distance
         for ( int i = 0; i < 3; ++i )
         {
             for ( int j = 0; j < 3; ++j )

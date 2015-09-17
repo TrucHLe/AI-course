@@ -184,11 +184,11 @@ void FileManager::getAlgorithmNumber()
     cout << endl;
     cout << "Search Algorithms:" << endl;
     cout << "   1. Breadth-First Seach" << endl;
-    cout << "   2. Depth-First Search" << endl;
-    cout << "   3. Iterative Deepening Depth First Search" << endl;
-    cout << "   4. Best-First Search" << endl;
-    cout << "   5. A* Search" << endl;
-    cout << "   6. Run all search algorithms" << endl;
+    cout << "   2. A* Search" << endl;
+//    cout << "   3. Iterative Deepening Depth First Search" << endl;
+//    cout << "   4. Best-First Search" << endl;
+//    cout << "   5. Depth-First Search" << endl;
+//    cout << "   6. Run all search algorithms" << endl;
     cout << endl;
     cout << "Enter a search algorithm's number:" << endl;
     cout << "$ ";
@@ -203,7 +203,7 @@ void FileManager::getAlgorithmNumber()
         cout << "Algorithm Number: ";
     }
     
-    while ( algorithm_number < 1 || algorithm_number > 6 )
+    while ( algorithm_number < 1 || algorithm_number > 2 )
     {
         cout << "(!) Invalid algorithm number, try again." << endl;
         cout << "Algorithm Number: ";
@@ -211,12 +211,12 @@ void FileManager::getAlgorithmNumber()
     }
     
     
-    if ( algorithm_number == 2 )
-    {
-        cout << "Depth limit for Depth-First Search: ";
-        cin >> DFS_depth;
-    }
-    else
+//    if ( algorithm_number == 2 )
+//    {
+//        cout << "Depth limit for Depth-First Search: ";
+//        cin >> DFS_depth;
+//    }
+//    else
         DFS_depth = 0;
     
 }

@@ -20,9 +20,11 @@ class Node
 public:
     State state;
     Node* parent;
+    int parent_AS_queue_index;
+    
     Node();
     Node( State s, Node* p );
-    
+    Node( State s, Node* p, int i ); // dummy boolean to distinguish from top constructor
 };
 
 

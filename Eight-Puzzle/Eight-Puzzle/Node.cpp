@@ -25,6 +25,14 @@ Node::Node( State s, Node* p )
     parent = p;
 }
 
+
+Node::Node( State s, Node* p, int i )
+{
+    state = s;
+    parent = p;
+    parent_AS_queue_index = i;
+}
+
 //
 // !Constructors
 //===---------------------------------------===//
