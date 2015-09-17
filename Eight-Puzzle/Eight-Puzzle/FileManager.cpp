@@ -158,12 +158,12 @@ void FileManager::checkAndGetGrid() // don't know why grid is automatically pass
     
     
     cout << endl;
-    cout << "-- Puzzle --" << endl;
+    cout << "Puzzle" << endl;
     
     for ( int i : { 0, 1, 2 } ) // Use loops since C++ arrays aren't assignable
     {
         for ( int j : { 0, 1, 2 } )
-            cout << grid[i][j] << "     ";
+            cout << grid[i][j] << " ";
         
         cout << endl;
     }
@@ -181,9 +181,6 @@ void FileManager::checkAndGetGrid() // don't know why grid is automatically pass
 //
 void FileManager::getAlgorithmNumber()
 {
-    int algorithm_number;
-    
-    
     cout << endl;
     cout << "Search Algorithms:" << endl;
     cout << "   1. Breadth-First Seach" << endl;
@@ -198,7 +195,7 @@ void FileManager::getAlgorithmNumber()
     
     
     
-    while ( !( cin >> algorithm_number ) ) // this calls and checks cin respectively
+    while ( !( cin >> algorithm_number ) ) // this calls and checks cin whether input is not a digit, respectively
     {
         cin.clear();
         cin.ignore( numeric_limits<streamsize>::max(), '\n' );
@@ -219,6 +216,8 @@ void FileManager::getAlgorithmNumber()
         cout << "Depth limit for Depth-First Search: ";
         cin >> DFS_depth;
     }
+    else
+        DFS_depth = 0;
     
 }
 

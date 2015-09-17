@@ -10,6 +10,8 @@
 #include <fstream>  // ifstream
 #include <iostream> // cin, cout
 #include <queue>    // queue
+#include <stack>    // stack
+#include <time.h>   // clock_t
 
 #include "FileManager.h"
 #include "Search.h"
@@ -20,20 +22,23 @@ using namespace std;
 
 
 
-
-
+//---------------------------------------------
+// Function headers
+//
+bool BrFS( Node node );
+bool DFS( Node node );
+bool IDS( Node node );
+bool BeFS( Node node );
+bool AS( Node node );
+void printGrid( string girdName, int grid[3][3], int printDebugGrid );
+void printSolution( Node node );
 
 
 
 //---------------------------------------------
-// Function headers
+// Debugging tools
 //
-//void BrFS( Node node );
-//void DFS( Node node );
-//void IDS( Node node );
-//void BeFS( Node node );
-//void AS( Node node );
-//void printSolution( Node node );
+bool print_debug_grid = false;
 
 
 
@@ -42,6 +47,7 @@ using namespace std;
 //
 int main(int argc, const char * argv[])
 {
+    clock_t time = clock();
     
     //---------------------------------------------
     // User Input
@@ -65,11 +71,23 @@ int main(int argc, const char * argv[])
     //---------------------------------------------
     
     
-    //    State state( grid );
-    //    Node node( state, NULL) ;
+    State state( grid );
+    Node node( state, NULL) ;
+
+    switch ( algorithm_number )
+    {
+        case 1:
+            if ( BrFS( node ) )
+            {
+                time = clock() - time;
+                cout << "Time completing Breadth-First Search: " << ( double ) time / CLOCKS_PER_SEC << " seconds"<< endl;
+            }
+            break;
+            
+        default:
+            break;
+    }
     
-    
-    //BrFS( node );
     
     return 0;
     
@@ -82,25 +100,185 @@ int main(int argc, const char * argv[])
 
 
 //===----------------------------------------------------------------------===//
+// Breadth-First Search
+//
+bool BrFS( Node node )
+{
+    queue<Node> BFSqueue;
+    State current_state;
+    Node* current_node;
+    
+    current_node    = &node; //point current node to node's value
+    current_state   = current_node->state;
+    
+    BFSqueue.push( *current_node );
+    
+    
+    // Debugging
+    
+    // cout << BFSqueue.front().state.grid[i][j] << " ";
+    // current_node->state.grid[i][j]
+
+    // !Debugging
+    
+    
+    while ( !BFSqueue.empty() )
+    {
+        printGrid( "Current Node", current_node->state.grid, 1 );
+        
+        
+        if ( current_node->state.canMove( Up ) && current_node->state.previousMove() != Down )
+        {
+            Node n = Node( State( current_state, Up ), current_node );
+            BFSqueue.push( n );
+            
+            printGrid( "Up", n.state.grid, 1 );
+            
+            
+            if ( n.state.isGoal() )
+            {
+                printSolution( n );
+                return true;
+            }
+        }
+        
+        
+        if ( current_node->state.canMove( Down ) && current_node->state.previousMove() != Up )
+        {
+            Node n = Node( State( current_state, Down ), current_node );
+            BFSqueue.push( n );
+
+            printGrid( "Down", n.state.grid, 1 );
+            
+            
+            if ( n.state.isGoal() )
+            {
+                printSolution( n );
+                return true;
+            }
+
+        }
+        
+        
+        if ( current_node->state.canMove( Left ) && current_node->state.previousMove() != Right )
+        {
+            Node n = Node( State( current_state, Left ), current_node );
+            BFSqueue.push( n );
+
+            printGrid( "Left", n.state.grid, 1 );
+
+            
+            if ( n.state.isGoal() )
+            {
+                printSolution( n );
+                return true;
+            }
+
+        }
+        
+        
+        if ( current_node->state.canMove( Right ) && current_node->state.previousMove() != Left )
+        {
+            Node n = Node( State( current_state, Right ), current_node );
+            BFSqueue.push( n );
+
+            printGrid( "Up", n.state.grid, 1 );
+
+            
+            if ( n.state.isGoal() )
+            {
+                printSolution( n );
+                return true;
+            }
+
+        }
+        
+
+        BFSqueue.pop();
+        
+        current_node    = &BFSqueue.front();
+        current_state   = current_node->state;
+        
+        
+        /*
+        // Debugging tools
+        cout << "-------------------------" << BFSqueue.size() << endl;
+        cout << endl;
+        // !Debugging tools
+        */
+    }
+
+    
+    return false;
+}
+
+//
+// !Breadth-First Search
+//===---------------------------------------===//
+
+
+
+//===----------------------------------------------------------------------===//
 // Print solution
 //
 void printSolution( Node node )
 {
-    vector<Directions> solution;
+    vector<Directions> directions;
+    stack<string> solution;
     Node* current_node;
     
-    *current_node = node;
+    current_node = &node;
+
     
     while ( current_node->parent != NULL )
     {
-        solution.push_back( current_node->parent->state.previousMove() );
+        printGrid( "Parent", current_node->state.grid, 1 );
+        
+        directions.push_back( current_node->state.previousMove() );
         current_node = current_node->parent;
     }
     
-    for ( Directions d : solution )
+    
+    for ( Directions direction : directions )
     {
-        cout << d << endl;
+        switch ( direction ) {
+            case Up:
+                solution.push( "Up " );
+                break;
+                
+            case Down:
+                solution.push( "Down " );
+                break;
+                
+            case Left:
+                solution.push( "Left " );
+                break;
+                
+            case Right:
+                solution.push( "Right " );
+                break;
+                
+            case None:
+                break;
+                
+        }
     }
+    
+    
+    cout << endl;
+    printGrid( "Puzzle", current_node->state.grid, 0 ); // at this time, current_node is
+                                                        // pointing at the original puzzle
+                                                        // since solution reads backwards
+    
+    
+    cout << "Solution: ";
+    while ( !solution.empty() )
+    {
+        cout << solution.top();
+        solution.pop();
+    }
+    cout << endl;
+    
 }
 
 //
@@ -110,69 +288,38 @@ void printSolution( Node node )
 
 
 //===----------------------------------------------------------------------===//
-// Breadth-First Search
+// Print grid
 //
-void BrFS( Node node )
+void printGrid( string gridName, int grid[3][3], int printDebugGrid )
 {
-    queue<Node> BFSqueue;
-    State current_state;
-    Node* current_node;
-    
-    *current_node   = node; //point current node to node's value
-    current_state   = current_node->state;
-    
-    BFSqueue.push( node );
-    
-    
-    while ( !BFSqueue.empty() )
+    if ( printDebugGrid == 1 )
     {
-        if ( current_node->state.canMove( Up ) && current_node->state.previousMove() != Down )
+        if ( print_debug_grid )
         {
-            Node n = Node( State( current_state, Up ), current_node );
-            BFSqueue.push( n );
-            
-            if ( n.state.isGoal() )
-                printSolution( n );
+            cout << gridName << endl;
+            for ( int i : { 0, 1, 2 } )
+            {
+                for ( int j : { 0, 1, 2 } )
+                    cout << grid[i][j] << " ";
+                cout << endl;
+            }
+            cout << endl;
         }
-        
-        
-        if ( current_node->state.canMove( Down ) && current_node->state.previousMove() != Up )
+    }
+    else
+    {
+        cout << gridName << endl;
+        for ( int i : { 0, 1, 2 } )
         {
-            Node n = Node( State( current_state, Down ), current_node );
-            BFSqueue.push( n );
-            
-            if ( n.state.isGoal() )
-                printSolution( n );
+            for ( int j : { 0, 1, 2 } )
+                cout << grid[i][j] << " ";
+            cout << endl;
         }
-        
-        
-        if ( current_node->state.canMove( Left ) && current_node->state.previousMove() != Right )
-        {
-            Node n = Node( State( current_state, Left ), current_node );
-            BFSqueue.push( n );
-            
-            if ( n.state.isGoal() )
-                printSolution( n );
-        }
-        
-        
-        if ( current_node->state.canMove( Right ) && current_node->state.previousMove() != Left )
-        {
-            Node n = Node( State( current_state, Right ), current_node );
-            BFSqueue.push( n );
-            
-            if ( n.state.isGoal() )
-                printSolution( n );
-        }
-        
-        
-        BFSqueue.pop();
-        *current_node = BFSqueue.front();
-        
+        cout << endl;
     }
     
 }
 
 //
-// !Breadth-First Search
+// !printGrid
 //===---------------------------------------===//
