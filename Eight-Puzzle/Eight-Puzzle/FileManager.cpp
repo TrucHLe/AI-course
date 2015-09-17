@@ -6,21 +6,33 @@
 //  Copyright (c) 2015 Truc Le. All rights reserved.
 //
 
-#include <stdio.h>
-#include <string>   // string
-#include <fstream>  // ifstream
-#include <iostream> // cin, cout
+#include "FileManager.h"
 
-using namespace std;
+
+
+//===----------------------------------------------------------------------===//
+// Constructor
+//
+FileManager::FileManager()
+{
+    input_file = getFile();
+    checkAndGetGrid();
+    getAlgorithmNumber();
+    
+}
+
+//
+// !Constructor
+//===---------------------------------------===//
 
 
 
 //===----------------------------------------------------------------------===//
 // Get file
 //
-ifstream getFile()
+ifstream FileManager::getFile()
 {
-    ifstream input_file;
+    ifstream file;
     string file_path;
     
     cout << "---------- Eight-Puzzle Solver ----------" << endl;
@@ -31,17 +43,17 @@ ifstream getFile()
     
     
     cin >> file_path;
-    input_file.open( file_path );
+    file.open( file_path );
     
-    while ( input_file.fail() )
+    while ( file.fail() )
     {
         cout << "(!) Cannot find " << file_path << ", try again." << endl;
         cout << "$ ";
         cin >> file_path;
-        input_file.open( file_path );
+        file.open( file_path );
     }
     
-    return input_file;
+    return file;
 }
 
 //
@@ -53,7 +65,7 @@ ifstream getFile()
 //===----------------------------------------------------------------------===//
 // Get current character
 //
-char getCurrentCharacter( int column_number, string current_line, ifstream& input_file )
+char FileManager::getCurrentCharacter()
 {
     if ( column_number <= current_line.size() )
         // Still within current line
@@ -78,7 +90,7 @@ char getCurrentCharacter( int column_number, string current_line, ifstream& inpu
 //===----------------------------------------------------------------------===//
 // Advance to the next character
 //
-void advance( int& column_number, int& line_number, string& current_line, ifstream& input_file )
+void FileManager::advance()
 {
     if ( column_number <= current_line.size() )
         // Still within current line
@@ -106,12 +118,9 @@ void advance( int& column_number, int& line_number, string& current_line, ifstre
 //===----------------------------------------------------------------------===//
 // Check and get grid
 //
-void checkAndGetGrid( ifstream& input_file, int grid[3][3] ) // don't know why grid is automatically pass-by-reference
+void FileManager::checkAndGetGrid() // don't know why grid is automatically pass-by-reference
 {
-    int line_number;
-    int column_number;
     int digit_counter;
-    string current_line;
     char current_character;
     
     
@@ -122,11 +131,10 @@ void checkAndGetGrid( ifstream& input_file, int grid[3][3] ) // don't know why g
     
     getline( input_file, current_line ); // Set first line to be current line
     
-    
     while ( digit_counter < 9 )
     {
-        current_character = getCurrentCharacter( column_number, current_line, input_file );
-        
+        current_character = getCurrentCharacter();
+
         
         if ( isalpha( current_character ) || line_number > 3 )
         {
@@ -144,7 +152,8 @@ void checkAndGetGrid( ifstream& input_file, int grid[3][3] ) // don't know why g
             ++digit_counter;
         }
         
-        advance( column_number, line_number, current_line, input_file);
+        advance();
+
     }
     
     
@@ -170,7 +179,7 @@ void checkAndGetGrid( ifstream& input_file, int grid[3][3] ) // don't know why g
 //===----------------------------------------------------------------------===//
 // Get algorithm number
 //
-int getAlgorithmNumber()
+void FileManager::getAlgorithmNumber()
 {
     int algorithm_number;
     
@@ -182,6 +191,7 @@ int getAlgorithmNumber()
     cout << "   3. Iterative Deepening Depth First Search" << endl;
     cout << "   4. Best-First Search" << endl;
     cout << "   5. A* Search" << endl;
+    cout << "   6. Run all search algorithms" << endl;
     cout << endl;
     cout << "Enter a search algorithm's number:" << endl;
     cout << "$ ";
@@ -196,7 +206,7 @@ int getAlgorithmNumber()
         cout << "Algorithm Number: ";
     }
     
-    while ( algorithm_number < 1 || algorithm_number > 5 )
+    while ( algorithm_number < 1 || algorithm_number > 6 )
     {
         cout << "(!) Invalid algorithm number, try again." << endl;
         cout << "Algorithm Number: ";
@@ -204,7 +214,11 @@ int getAlgorithmNumber()
     }
     
     
-    return algorithm_number;
+    if ( algorithm_number == 2 )
+    {
+        cout << "Depth limit for Depth-First Search: ";
+        cin >> DFS_depth;
+    }
     
 }
 

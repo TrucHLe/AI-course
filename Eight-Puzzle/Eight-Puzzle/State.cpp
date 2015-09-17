@@ -32,6 +32,26 @@ State::State( int g[3][3] )
             if ( grid[i][j] == 0 )
                 blank_tile = make_pair( i, j );
         }
+    
+    previous_move = None;
+}
+
+
+State::State( State s, Directions d )
+{
+    for ( int i : { 0, 1, 2 } ) // Use loops since C++ arrays aren't assignable
+        for ( int j : { 0, 1, 2 } )
+        {
+            grid[i][j] = s.grid[i][j];
+            
+            if ( grid[i][j] == 0 )
+                blank_tile = make_pair( i, j );
+        }
+    
+    previous_move = d;
+    
+    moveBlank( d );
+    
 }
 
 //
@@ -62,7 +82,7 @@ bool State::isGoal()
 //===----------------------------------------------------------------------===//
 // Check whether the blank tile can move to the specified direction
 //
-bool State::blankCanMove( Directions direction )
+bool State::canMove( Directions direction )
 {
     int tile_x = get<0>( blank_tile );
     int tile_y = get<1>( blank_tile );
@@ -96,11 +116,46 @@ bool State::blankCanMove( Directions direction )
             else
                 return false;
             break;
+            
+        case None:
+            return false;
+            break;
     }
 }
 
 //
-// !blankCanMove
+// !canMove
+//===---------------------------------------===//
+
+
+
+//===----------------------------------------------------------------------===//
+// Get the previous move
+//
+Directions State::previousMove()
+{
+    return previous_move;
+}
+
+//
+// !previousMove
+//===---------------------------------------===//
+
+
+
+//===----------------------------------------------------------------------===//
+// Set the blank tile's position
+//
+void State::setBlank( int x, int y )
+{
+    get<0>( blank_tile ) = x;
+    get<1>( blank_tile ) = y;
+    
+    grid[x][y] = 0;
+}
+
+//
+// !setBlank
 //===---------------------------------------===//
 
 
@@ -110,8 +165,10 @@ bool State::blankCanMove( Directions direction )
 //
 void State::moveBlank( Directions direction )
 {
-    if ( blankCanMove( direction ) )
+    if ( canMove( direction ) )
     {
+        previous_move = direction; // remember the previous move
+        
         int tile_x = get<0>( blank_tile );
         int tile_y = get<1>( blank_tile );
 
@@ -119,23 +176,26 @@ void State::moveBlank( Directions direction )
         switch ( direction )
         {
             case Up:
-                grid[ tile_x ][ tile_y ]        = grid[ tile_x - 1 ][ tile_y ];
-                grid[ tile_x - 1 ][ tile_y ]    = 0;
+                grid[ tile_x ][ tile_y ] = grid[ tile_x - 1 ][ tile_y ];
+                setBlank( tile_x - 1, tile_y );
                 break;
                 
             case Down:
-                grid[ tile_x ][ tile_y ]        = grid[ tile_x + 1 ][ tile_y ];
-                grid[ tile_x + 1 ][ tile_y ]    = grid[ tile_x ][ tile_y ];
+                grid[ tile_x ][ tile_y ] = grid[ tile_x + 1 ][ tile_y ];
+                setBlank( tile_x + 1, tile_y );
                 break;
                 
             case Left:
-                grid[ tile_x ][ tile_y ]        = grid[ tile_x ][ tile_y - 1 ];
-                grid[ tile_x ][ tile_y - 1 ]    = grid[ tile_x ][ tile_y ];
+                grid[ tile_x ][ tile_y ] = grid[ tile_x ][ tile_y - 1 ];
+                setBlank( tile_x, tile_y - 1 );
                 break;
                 
             case Right:
-                grid[ tile_x ][ tile_y ]        = grid[ tile_x ][ tile_y + 1 ];
-                grid[ tile_x ][ tile_y + 1 ]    = grid[ tile_x ][ tile_y ];
+                grid[ tile_x ][ tile_y ] = grid[ tile_x ][ tile_y + 1 ];
+                setBlank( tile_x, tile_y + 1 );
+                break;
+                
+            case None:
                 break;
         }
     }

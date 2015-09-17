@@ -16,7 +16,7 @@
 using namespace std;
 
 
-enum Directions { Up, Down, Left, Right };
+enum Directions { Up, Down, Left, Right, None };
 
 
 class State
@@ -25,14 +25,18 @@ class State
 private:
     int grid[3][3];
     pair<int, int> blank_tile;
+    Directions previous_move;
     
     
 public:
     State();
     State( int g[3][3] ); //init State and find the blank tile
+    State( State s, Directions d ); // for creating child state
     
     bool isGoal();
-    bool blankCanMove( Directions direction );
+    bool canMove( Directions direction );
+    Directions previousMove();
+    void setBlank( int x, int y );
     void moveBlank( Directions direction );
     
     pair<int, int> tilePosition( int tileValue );

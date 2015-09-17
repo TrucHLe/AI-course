@@ -17,14 +17,9 @@
 class Node
 {
     
-private:
+public:
     State state;
     Node* parent;
-    Node* child;
-    vector<Node*> children;
-    
-    
-public:
     Node();
     Node( State s, Node* p );
     
