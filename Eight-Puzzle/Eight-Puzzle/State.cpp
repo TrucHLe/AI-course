@@ -14,8 +14,14 @@ using namespace std;
 
 
 //===----------------------------------------------------------------------===//
-// Constructor
+// Constructors
 //
+State::State()
+{
+    
+}
+
+
 State::State( int g[3][3] )
 {
     for ( int i : { 0, 1, 2 } ) // Use loops since C++ arrays aren't assignable
@@ -29,7 +35,7 @@ State::State( int g[3][3] )
 }
 
 //
-// !Constructor
+// !Constructors
 //===---------------------------------------===//
 
 

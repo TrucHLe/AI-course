@@ -28,6 +28,7 @@ private:
     
     
 public:
+    State();
     State( int g[3][3] ); //init State and find the blank tile
     
     bool isGoal();

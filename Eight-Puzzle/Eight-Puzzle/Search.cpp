@@ -51,17 +51,10 @@ int main(int argc, const char * argv[])
     // !User Input
     //--------------------------------------------------
 
-
+    
     State state( grid );
+    Node node( state, NULL) ;
 
-
-    
-    
-
-    
-    
-    
-    
     
     return 0;
 
