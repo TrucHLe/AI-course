@@ -34,6 +34,7 @@ State::State( int g[3][3] )
         }
     
     previous_move = None;
+    manhattan_distance = ManhattanDistance();
 }
 
 
@@ -49,8 +50,9 @@ State::State( State s, Directions d )
         }
     
     previous_move = d;
-    
     moveBlank( d );
+    
+    manhattan_distance = ManhattanDistance();
     
 }
 
@@ -200,7 +202,6 @@ void State::moveBlank( Directions direction )
         }
     }
     
-    // Recheck to see if I need to throw error when blank can't move to d
 }
 
 //

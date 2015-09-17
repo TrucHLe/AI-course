@@ -26,7 +26,7 @@ public:
     int grid[3][3];
     pair<int, int> blank_tile;
     Directions previous_move;
-
+    int manhattan_distance;
     
     State();
     State( int g[3][3] ); //init State and find the blank tile
@@ -34,7 +34,9 @@ public:
     
     bool isGoal();
     bool canMove( Directions direction );
+    
     Directions previousMove();
+    
     void setBlank( int x, int y );
     void moveBlank( Directions direction );
     
