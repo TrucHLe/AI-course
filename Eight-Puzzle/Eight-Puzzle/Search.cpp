@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Truc Le. All rights reserved.
 //
 
-
 #include <fstream>  // ifstream
 #include <iostream> // cin, cout
 #include <queue>    // queue
@@ -533,9 +532,9 @@ void printNode( Node* node, string gridName, int distance, int isDebuggingNode )
         if ( print_debug_grid )
         {
             cout << gridName << endl;
-            for ( int i = 0; i < 3; ++i )
+            for ( int i : { 0, 1, 2 } )
             {
-                for ( int j = 0; j < 3; ++j )
+                for ( int j : { 0, 1, 2 } )
                     cout << node->state.grid[i][j] << " ";
                 cout << endl;
             }
@@ -545,9 +544,9 @@ void printNode( Node* node, string gridName, int distance, int isDebuggingNode )
     else if ( isDebuggingNode == 0 )
     {
         cout << gridName << endl; //<< " --- " << distance
-        for ( int i = 0; i < 3; ++i )
+        for ( int i : { 0, 1, 2 } )
         {
-            for ( int j = 0; j < 3; ++j )
+            for ( int j : { 0, 1, 2 } )
                 cout << node->state.grid[i][j] << " ";
             cout << endl;
         }
