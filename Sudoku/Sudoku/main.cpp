@@ -25,6 +25,33 @@ map<string, vector<vector<string> > > units;	//map each square to its units
 map<string, vector<string> > peers;				//map each square to its peers
 
 
+
+
+
+//===------------------------------===//
+// Print sudoku
+//===------------------------------===//
+void print() {
+	cout << endl;
+	for (int s = 1; s < sudoku.size() + 1; ++s) {
+		cout << sudoku.at(s - 1) << " ";
+		
+		if (s % 27 == 0 && s % 81 != 0) {
+			cout << endl;
+			cout << "------+------+------" << endl;
+		}
+		else if (s % 9 == 0) {
+			cout << endl;
+		}
+		else if (s % 3 == 0) {
+			cout << "|";
+		}
+	}
+}
+
+
+
+
 //===------------------------------===//
 // Concatenate each of 2 vectors' elements
 //===------------------------------===//
@@ -55,6 +82,8 @@ vector<string> cross(vector<string> A, string b) {
 	}
 	return crossed;
 }
+
+
 
 
 
@@ -118,8 +147,9 @@ void initGlobalVar() {
 		pair<string, vector<string> > peer(s, corresponding_peers);
 		peers.insert(peer);
 	}
-
 }
+
+
 
 
 
@@ -132,7 +162,7 @@ int main(int argc, const char * argv[]) {
 	FileManager file = FileManager();
 	sudoku = file.sudoku;
 	initGlobalVar();
-	
+	print();
 
 
 	
