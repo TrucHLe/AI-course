@@ -19,7 +19,7 @@
 //===------------------------------===//
 FileManager::FileManager() {
     input = getFile();
-    getSudoku();
+    getGrid();
 }
 
 
@@ -33,7 +33,7 @@ ifstream FileManager::getFile() {
     string file_path;
     
     cout << "---------- Sudoku ----------" << endl;
-    cout << "Enter a filename.txt of a Sudoku puzzle: ";
+    cout << "Enter a relative file path of a Sudoku puzzle text file: ";
     
     
     cin >> file_path;
@@ -41,8 +41,7 @@ ifstream FileManager::getFile() {
     
     while ( file.fail() )
     {
-        cout << "(!) Cannot find " << file_path << ", try again." << endl;
-        cout << "$ ";
+        cout << "(!) Cannot find " << file_path << ", try again: ";
         cin >> file_path;
         file.open( file_path );
     }
@@ -92,7 +91,7 @@ void FileManager::advance() {
 //===------------------------------===//
 // Parse file's digits to array of int
 //===------------------------------===//
-void FileManager::getSudoku() {
+void FileManager::getGrid() {
 	
     int digit_counter   = 0;
     line_number         = 1;
@@ -106,11 +105,11 @@ void FileManager::getSudoku() {
 			break;
 		}
 		else if (isalpha(getCurrentChar())) {
-			cout << "(!) File contains alphabetic character" << endl;
+			cout << "(!) Sudoku shouldn't contain alphabetic character" << endl;
 			exit(1);
 		}
 		else if (isdigit(getCurrentChar())) {
-			sudoku.push_back(getCurrentChar() - 48);
+			grid.push_back(string(1, getCurrentChar()));
 			++digit_counter;
 		}
 		

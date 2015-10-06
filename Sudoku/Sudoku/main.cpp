@@ -15,40 +15,210 @@
 using namespace std;
 
 
-vector<int> sudoku;
+//===------------------------------===//
+// Global variables
+vector<string> grid;							//original Sudoku grid
 vector<string> digits;
 vector<string> rows;
 vector<string> cols;
-vector<string> squares;							//each square of the sudoku
-vector<vector<string> > unitlist;				//all possible units
-map<string, vector<vector<string> > > units;	//map each square to its units
-map<string, vector<string> > peers;				//map each square to its peers
+vector<string> squares;							//all 1x1 Sudoku's squares
+vector<vector<string> > unitlist;				//27 possible units (9 columns + 9 rows + 9 3x3 squares)
+map<string, vector<vector<string> > > units;	//map each square to its 3 corresponding units
+map<string, vector<string> > peers;				//map each square to its 20 corresponding peers
+map<string, string> values;						//map each square to its possible values
 
+
+
+//===------------------------------===//
+// Function headers
+void printGrid();
+vector<string> cross(vector<string> A, vector<string> B);
+vector<string> cross(string a, vector<string> B);
+vector<string> cross(vector<string> A, string b);
+void initGlobalVar();
+bool eliminate(string square, string digit);
+bool assign(string square, string digit);
+map<string, string> gridValues();
+bool parseGridToValues();
 
 
 
 
 //===------------------------------===//
-// Print sudoku
+// Parse grid into map of each square
+// and its possible values
 //===------------------------------===//
-void print() {
-	cout << endl;
-	for (int s = 1; s < sudoku.size() + 1; ++s) {
-		cout << sudoku.at(s - 1) << " ";
-		
-		if (s % 27 == 0 && s % 81 != 0) {
-			cout << endl;
-			cout << "------+------+------" << endl;
-		}
-		else if (s % 9 == 0) {
-			cout << endl;
-		}
-		else if (s % 3 == 0) {
-			cout << "|";
+bool parseGridToValues() {
+
+	//assign values 1-9 to every square
+	for (string sq : squares) {
+		values.insert(pair<string, string>(sq, "123456789"));
+	}
+	
+	for (pair<string, string> p : gridValues()) {
+		if (find(digits.begin(), digits.end(), get<1>(p)) != digits.end() && !assign(get<0>(p), get<1>(p))) {
+			return false;
 		}
 	}
+	return true;
 }
 
+
+
+//===------------------------------===//
+// Map each square to its original value
+//===------------------------------===//
+map<string, string> gridValues() {
+	map<string, string> grid_values;
+	for (int i = 0; i < grid.size(); ++i) {
+		grid_values.insert(pair<string, string>(squares.at(i), grid.at(i)));
+	}
+	return grid_values;
+}
+
+
+
+//===------------------------------===//
+// Eliminate all other values (except d)
+// from possible values of square s.
+// Return fasle if found contradiction
+//===------------------------------===//
+bool assign(string s, string d) {
+	string& other_values = values.at(s);
+
+	for (int i = 0; i < other_values.size(); ++i) {
+		string val(1, other_values.at(i));
+
+		if (!eliminate(s, val)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+//===------------------------------===//
+// Eliminate a digit from a square's
+// string of possible values
+//===------------------------------===//
+bool eliminate(string s, string d) {
+	string& val = values.at(s);
+	
+	if (val.find(d) != string::npos) { //check if d is already eliminated
+		val.erase(val.find_first_of(d));
+	
+		
+		if (val.size() == 0) {
+			return false; //error, we removed the last node
+		}
+		else if (val.size() == 1) {
+			string d1 = val;
+			
+			//Check value of s against its PEERS,
+			//if s has 1 mapped value (d1),
+			//eliminate d1 from its peers
+			for (string p : peers.at(s)) {
+				
+				if (!eliminate(p, d1)) {
+					return false; //error, can't eliminate from peers
+				}
+			}
+		}
+		
+		
+		
+		//Check the above eliminated value d
+		//against UNITS of s, if there's a unit
+		//that was reduced to 1 possibility, put d there
+		for (vector<string> vStr : units.at(s)) {
+			vector<string> places_of_d;
+			
+			
+			//find squares that have d as a possibility
+			for (string str : vStr) {
+				if (values.at(str).find(d) != string::npos) {
+					places_of_d.push_back(str);
+				}
+			}
+			if (places_of_d.size() == 0) {
+				return false; //error, no square can hold d
+			}
+			else if (places_of_d.size() == 1) {
+				if (!assign(places_of_d.at(0), d)) { //assign d to the only square left that can hold d
+					return false;
+				}
+			}
+		}
+		
+	}
+	return true;
+}
+
+
+
+//===------------------------------===//
+// Initialize global variables
+//===------------------------------===//
+void initGlobalVar() {
+	digits = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
+	rows = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};
+	cols = digits;
+	squares = cross(rows, digits);
+	
+	
+	//----------------
+	// Unitlist
+	for (string c : cols) {
+		unitlist.push_back(cross(rows, c));
+	}
+	for (string r : rows) {
+		unitlist.push_back(cross(r, cols));
+	}
+	
+	vector<vector<string> > colGroup = {{"A", "B", "C"}, {"D", "E", "F"}, {"G", "H", "I"}};
+	vector<vector<string> > rowGroup = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}};
+	for (vector<string> A : colGroup) {
+		for (vector<string> B : rowGroup) {
+			unitlist.push_back(cross(A, B));
+		}
+	}
+	
+	
+	
+	for (string sq : squares) {
+		vector<vector<string> > corresponding_unitlist;
+		vector<string> corresponding_peers;
+		
+		
+		//----------------
+		// Units
+		for (vector<string> vStr : unitlist) {
+			for (string str : vStr) {
+				if (sq.compare(str) == 0) {
+					corresponding_unitlist.push_back(vStr);
+					break;
+				}
+			}
+		}
+		pair<string, vector<vector<string> > > unit(sq, corresponding_unitlist);
+		units.insert(unit);
+		
+		
+		//----------------
+		// Peers
+		for (vector<string> vStr : corresponding_unitlist) {
+			for (string str : vStr) {
+				if (sq.compare(str) != 0 && find(corresponding_peers.begin(), corresponding_peers.end(), str) == corresponding_peers.end()) {
+					corresponding_peers.push_back(str);
+				}
+			}
+		}
+		pair<string, vector<string> > peer(sq, corresponding_peers);
+		peers.insert(peer);
+	}
+}
 
 
 
@@ -85,71 +255,26 @@ vector<string> cross(vector<string> A, string b) {
 
 
 
-
-
 //===------------------------------===//
-// Initialize global variables
+// Print grid, print values
 //===------------------------------===//
-void initGlobalVar() {
-	digits = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
-	rows = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};
-	cols = digits;
-	squares = cross(rows, digits);
-	
-	
-	//----------------
-	// Unitlist
-	for (string c : cols) {
-		unitlist.push_back(cross(rows, c));
-	}
-	for (string r : rows) {
-		unitlist.push_back(cross(r, cols));
-	}
-	
-	vector<vector<string> > colGroup = {{"A", "B", "C"}, {"D", "E", "F"}, {"G", "H", "I"}};
-	vector<vector<string> > rowGroup = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}};
-	for (vector<string> A : colGroup) {
-		for (vector<string> B : rowGroup) {
-			unitlist.push_back(cross(A, B));
+void printGrid() {
+	cout << endl;
+	for (int g = 1; g < grid.size() + 1; ++g) {
+		cout << grid.at(g - 1) << " ";
+		
+		if (g % 27 == 0 && g % 81 != 0) {
+			cout << endl;
+			cout << "------+------+------" << endl;
 		}
-	}
-	
-	
-	
-	for (string s : squares) {
-		vector<vector<string> > corresponding_unitlist;
-		vector<string> corresponding_peers;
-		
-		
-		//----------------
-		// Units
-		for (vector<string> vStr : unitlist) {
-			for (string str : vStr) {
-				if (s.compare(str) == 0) {
-					corresponding_unitlist.push_back(vStr);
-					break;
-				}
-			}
+		else if (g % 9 == 0) {
+			cout << endl;
 		}
-		pair<string, vector<vector<string> > > unit(s, corresponding_unitlist);
-		units.insert(unit);
-		
-		
-		//----------------
-		// Peers
-		for (vector<string> vStr : corresponding_unitlist) {
-			for (string str : vStr) {
-				if (s.compare(str) != 0 && find(corresponding_peers.begin(), corresponding_peers.end(), str) == corresponding_peers.end()) {
-					corresponding_peers.push_back(str);
-				}
-			}
+		else if (g % 3 == 0) {
+			cout << "|";
 		}
-		pair<string, vector<string> > peer(s, corresponding_peers);
-		peers.insert(peer);
 	}
 }
-
-
 
 
 
@@ -160,9 +285,12 @@ void initGlobalVar() {
 int main(int argc, const char * argv[]) {
 
 	FileManager file = FileManager();
-	sudoku = file.sudoku;
+	grid = file.grid;
 	initGlobalVar();
-	print();
+	
+	printGrid();
+	parseGridToValues();
+	printGrid();
 
 
 	

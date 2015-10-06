@@ -26,12 +26,12 @@ private:
 
 public:
     FileManager();
-    vector<int> sudoku;
+    vector<string> grid;
     
     ifstream getFile();
     char getCurrentChar();
     void advance();
-    void getSudoku();
+    void getGrid();
     
 };
 
