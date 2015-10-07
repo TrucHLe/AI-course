@@ -135,16 +135,13 @@ map<string, string> gridValues(vector<string> gr) {
 // Return fasle if found contradiction
 //===------------------------------===//
 map<string, string> assign(map<string, string> &values, string s, string d) {
-	//cout << s << ": " << d << endl; //debug
 	
 	string other_values = values.at(s);
 	other_values.erase(remove(other_values.begin(), other_values.end(), d[0]), other_values.end());
 	
-	cout << "Other values: " << other_values << endl; //debug
 	
 	for (int i = 0; i < other_values.size(); ++i) {
 		string val(1, other_values.at(i));
-		
 		eliminate(values, s, val);
 	}
 
@@ -158,55 +155,57 @@ map<string, string> assign(map<string, string> &values, string s, string d) {
 // string of possible values
 //===------------------------------===//
 map<string, string> eliminate(map<string, string> &values, string s, string d) {
-	string val = values.at(s);
+	string* val = &values.at(s);
 	
 	
-	if (val.find(d) != string::npos) { //check if d is already eliminated
-		
-		val.erase(remove(val.begin(), val.end(), d[0]), val.end());
-		
-		
-		if (val.size() == 0) {
-			cout << "(!) A Sudoku square cannot be assigned any value" << endl;
-			exit(1); //error, we removed the last node
-		}
-		else if (val.size() == 1) {
-			string d1 = val;
-			
-			//Check value of s against its PEERS,
-			//if s has 1 mapped value (d1),
-			//eliminate d1 from its peers
-			for (string p : peers.at(s)) {
-				
-				eliminate(values, p, d1);
-			}
-		}
-		
-		
-		
-		//Check the above eliminated value d
-		//against UNITS of s, if there's a unit
-		//that was reduced to 1 possibility, put d there
-		for (vector<string> vStr : units.at(s)) {
-			vector<string> places_of_d;
-			
-			
-			//find squares that have d as a possibility
-			for (string str : vStr) {
-				if (values.at(str).find(d) != string::npos) {
-					places_of_d.push_back(str);
-				}
-			}
-			if (places_of_d.size() == 0) {
-				cout << "(!) Cannot assign computed value to Sudoku" << endl;
-				exit(1); //error, no square can hold d
-			}
-			else if (places_of_d.size() == 1) {
-				assign(values, places_of_d.at(0), d); //assign d to the only square left that can hold d
-			}
-		}
-		
+	if (val->find(d) == string::npos) { //d is already eliminated
+		return values;
 	}
+
+	
+	
+	val->erase(remove(val->begin(), val->end(), d[0]), val->end());
+	
+	if (val->size() == 0) {
+		cout << "(!) A Sudoku square cannot be assigned any value" << endl;
+		exit(1); //error, we removed the last node
+	}
+	else if (val->size() == 1) {
+		string* d1 = val;
+		
+		//Check value of s against its PEERS,
+		//if s has 1 mapped value (d1),
+		//eliminate d1 from its peers
+		for (string p : peers.at(s)) {
+			
+			eliminate(values, p, *d1);
+		}
+	}
+	
+		
+	//Check the above eliminated value d
+	//against UNITS of s, if there's a unit
+	//that was reduced to 1 possibility, put d there
+	for (vector<string> vStr : units.at(s)) {
+		vector<string> places_of_d;
+		
+		
+		//find squares that have d as a possibility
+		for (string str : vStr) {
+			if (values.at(str).find(d) != string::npos) {
+				places_of_d.push_back(str);
+			}
+		}
+		if (places_of_d.size() == 0) {
+			cout << "(!) Cannot assign computed value to Sudoku" << endl;
+			exit(1); //error, no square can hold d
+		}
+		else if (places_of_d.size() == 1) {
+			assign(values, places_of_d.at(0), d); //assign d to the only square left that can hold d
+		}
+	}
+	
+	
 	
 	return values;
 }
@@ -344,7 +343,7 @@ int main(int argc, const char * argv[]) {
 	initGlobalVar();
 	
 	printGrid();
-	parseGridToValues(grid);
+	printValues(parseGridToValues(grid));
 
 	
 	
