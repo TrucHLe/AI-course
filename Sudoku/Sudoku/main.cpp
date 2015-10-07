@@ -9,7 +9,7 @@
 #include <iostream>	//cin, cout
 #include <map>		//map
 #include <string.h>	//strcat
-#include <algorithm>//find
+#include <algorithm>//remove char from string
 #include "FileManager.h"
 
 using namespace std;
@@ -25,7 +25,6 @@ vector<string> squares;							//all 1x1 Sudoku's squares
 vector<vector<string> > unitlist;				//27 possible units (9 columns + 9 rows + 9 3x3 squares)
 map<string, vector<vector<string> > > units;	//map each square to its 3 corresponding units
 map<string, vector<string> > peers;				//map each square to its 20 corresponding peers
-map<string, string> values;						//map each square to its possible values
 
 
 
@@ -36,11 +35,58 @@ vector<string> cross(vector<string> A, vector<string> B);
 vector<string> cross(string a, vector<string> B);
 vector<string> cross(vector<string> A, string b);
 void initGlobalVar();
-bool eliminate(string square, string digit);
-bool assign(string square, string digit);
-map<string, string> gridValues();
-bool parseGridToValues();
+map<string, string> eliminate(map<string, string> &values, string square, string digit);
+map<string, string> assign(map<string, string> &values, string square, string digit);
+map<string, string> gridValues(vector<string> gr);
+map<string, string> parseGridToValues(vector<string> gr);
+void printValues(map<string, string> values);
 
+
+
+
+//===------------------------------===//
+// Print values
+//===------------------------------===//
+void printValues(map<string, string> values) {
+	
+	int width = 0;
+	for (string sq : squares) {
+		if (values.at(sq).size() > width) {
+			width = (int) values.at(sq).size();
+		}
+	}
+	++width;
+	
+	
+	map<string, string>::iterator it;
+	int c = 1;
+	cout << endl;
+	for (it = values.begin(); it != values.end(); ++it) {
+		cout << it->second;
+		
+		if ((it->second).size() < width) {
+			for (int w = 0; w < width - (it->second).size(); ++w) { cout << " "; }
+		}
+		
+		if (c % 27 == 0 && c % 81 != 0) {
+			cout << endl;
+			for (int w = 0; w < width * 3; ++w) { cout << "-"; }
+			cout << "+";
+			for (int w = 0; w < width * 3; ++w) { cout << "-"; }
+			cout << "+";
+			for (int w = 0; w < width * 3; ++w) { cout << "-"; }
+			cout << endl;
+		}
+		else if (c % 9 == 0) {
+			cout << endl;
+		}
+		else if (c % 3 == 0) {
+			cout << "|";
+		}
+		
+		++c;
+	}
+}
 
 
 
@@ -48,19 +94,23 @@ bool parseGridToValues();
 // Parse grid into map of each square
 // and its possible values
 //===------------------------------===//
-bool parseGridToValues() {
+map<string, string> parseGridToValues(vector<string> gr) {
 
+	map<string, string> values;
+	
 	//assign values 1-9 to every square
 	for (string sq : squares) {
 		values.insert(pair<string, string>(sq, "123456789"));
 	}
 	
-	for (pair<string, string> p : gridValues()) {
-		if (find(digits.begin(), digits.end(), get<1>(p)) != digits.end() && !assign(get<0>(p), get<1>(p))) {
-			return false;
+	
+	for (pair<string, string> p : gridValues(gr)) {
+		if (find(digits.begin(), digits.end(), get<1>(p)) != digits.end()) {
+			assign(values, get<0>(p), get<1>(p));
 		}
 	}
-	return true;
+	
+	return values;
 }
 
 
@@ -68,11 +118,12 @@ bool parseGridToValues() {
 //===------------------------------===//
 // Map each square to its original value
 //===------------------------------===//
-map<string, string> gridValues() {
+map<string, string> gridValues(vector<string> gr) {
 	map<string, string> grid_values;
-	for (int i = 0; i < grid.size(); ++i) {
-		grid_values.insert(pair<string, string>(squares.at(i), grid.at(i)));
+	for (int i = 0; i < gr.size(); ++i) {
+		grid_values.insert(pair<string, string>(squares.at(i), gr.at(i)));
 	}
+	
 	return grid_values;
 }
 
@@ -83,18 +134,21 @@ map<string, string> gridValues() {
 // from possible values of square s.
 // Return fasle if found contradiction
 //===------------------------------===//
-bool assign(string s, string d) {
-	string& other_values = values.at(s);
-
+map<string, string> assign(map<string, string> &values, string s, string d) {
+	//cout << s << ": " << d << endl; //debug
+	
+	string other_values = values.at(s);
+	other_values.erase(remove(other_values.begin(), other_values.end(), d[0]), other_values.end());
+	
+	cout << "Other values: " << other_values << endl; //debug
+	
 	for (int i = 0; i < other_values.size(); ++i) {
 		string val(1, other_values.at(i));
-
-		if (!eliminate(s, val)) {
-			return false;
-		}
+		
+		eliminate(values, s, val);
 	}
 
-	return true;
+	return values;
 }
 
 
@@ -103,15 +157,18 @@ bool assign(string s, string d) {
 // Eliminate a digit from a square's
 // string of possible values
 //===------------------------------===//
-bool eliminate(string s, string d) {
-	string& val = values.at(s);
+map<string, string> eliminate(map<string, string> &values, string s, string d) {
+	string val = values.at(s);
+	
 	
 	if (val.find(d) != string::npos) { //check if d is already eliminated
-		val.erase(val.find_first_of(d));
-	
+		
+		val.erase(remove(val.begin(), val.end(), d[0]), val.end());
+		
 		
 		if (val.size() == 0) {
-			return false; //error, we removed the last node
+			cout << "(!) A Sudoku square cannot be assigned any value" << endl;
+			exit(1); //error, we removed the last node
 		}
 		else if (val.size() == 1) {
 			string d1 = val;
@@ -121,9 +178,7 @@ bool eliminate(string s, string d) {
 			//eliminate d1 from its peers
 			for (string p : peers.at(s)) {
 				
-				if (!eliminate(p, d1)) {
-					return false; //error, can't eliminate from peers
-				}
+				eliminate(values, p, d1);
 			}
 		}
 		
@@ -143,17 +198,17 @@ bool eliminate(string s, string d) {
 				}
 			}
 			if (places_of_d.size() == 0) {
-				return false; //error, no square can hold d
+				cout << "(!) Cannot assign computed value to Sudoku" << endl;
+				exit(1); //error, no square can hold d
 			}
 			else if (places_of_d.size() == 1) {
-				if (!assign(places_of_d.at(0), d)) { //assign d to the only square left that can hold d
-					return false;
-				}
+				assign(values, places_of_d.at(0), d); //assign d to the only square left that can hold d
 			}
 		}
 		
 	}
-	return true;
+	
+	return values;
 }
 
 
@@ -289,9 +344,7 @@ int main(int argc, const char * argv[]) {
 	initGlobalVar();
 	
 	printGrid();
-	parseGridToValues();
-	printGrid();
-
+	parseGridToValues(grid);
 
 	
 	
