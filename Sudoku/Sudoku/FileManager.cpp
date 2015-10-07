@@ -33,7 +33,7 @@ ifstream FileManager::getFile() {
     string file_path;
     
     cout << "---------- Sudoku ----------" << endl;
-    cout << "Enter a relative file path of a Sudoku puzzle text file: ";
+    cout << "Enter relative file path of a Sudoku puzzle text file: ";
     
     
     cin >> file_path;

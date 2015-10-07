@@ -4,6 +4,7 @@
 //
 //  Created by Truc Le on 10/5/15.
 //  Copyright (c) 2015 Truc Le. All rights reserved.
+//	Based on Peter Norvig's techniques
 //
 
 #include <iostream>	//cin, cout
@@ -17,7 +18,7 @@ using namespace std;
 
 //===------------------------------===//
 // Global variables
-vector<string> grid;							//original Sudoku grid
+vector<string> grid;							//original grid
 vector<string> digits;
 vector<string> rows;
 vector<string> cols;
@@ -25,8 +26,9 @@ vector<string> squares;							//all 1x1 Sudoku's squares
 vector<vector<string> > unitlist;				//27 possible units (9 columns + 9 rows + 9 3x3 squares)
 map<string, vector<vector<string> > > units;	//map each square to its 3 corresponding units
 map<string, vector<string> > peers;				//map each square to its 20 corresponding peers
-
-
+bool path;
+vector<pair<string, string> > sorted_map;
+string startingSquare;
 
 //===------------------------------===//
 // Function headers
@@ -40,7 +42,204 @@ map<string, string> assign(map<string, string> &values, string square, string di
 map<string, string> gridValues(vector<string> gr);
 map<string, string> parseGridToValues(vector<string> gr);
 void printValues(map<string, string> values);
+void sortValues(map<string, string> values);
 
+
+map<string, string> search(map<string, string> values);
+map<string, string> solve();
+
+
+
+//===------------------------------===//
+// Solve Sudoku
+//===------------------------------===//
+map<string, string> solve() {
+	return search(parseGridToValues(grid));
+}
+
+
+
+//===------------------------------===//
+// Recursively search for solution
+// by trying all leftover possiblities
+// from constraint propagation
+//===------------------------------===//
+struct CompareValuesSize {
+	bool operator() (const pair<string, string>& first, const pair<string, string>& second) {
+		return get<1>(first).size() < get<1>(second).size();
+	}
+};
+
+
+map<string, string> search(map<string, string> values) {
+	
+	//failed parse grid
+	if (!path) {
+		return map<string, string>();
+	}
+	
+
+	//solved in parse grid
+	bool solved = true;
+	for (pair<string, string> val : values) {
+		if (get<1>(val).size() > 1) {
+			solved = false;
+		}
+	}
+	if (solved) { return values; }
+	
+	
+	
+	map<string, string> values_copy = values;
+	
+	
+	//start at square with least possibilities
+	vector<pair<string, string> > sorted_values;
+	CompareValuesSize compare;
+	for (pair<string, string> val : values) {
+		sorted_values.push_back(val);
+	}
+	sort(sorted_values.begin(), sorted_values.end(), compare);
+	
+	
+	
+	//try all digits of that square
+	string square;
+	string digits;
+	for (pair<string, string> sVal: sorted_values) {
+		if (get<1>(sVal).size() > 1) {
+			square = get<0>(sVal);
+			digits = get<1>(sVal);
+			break;
+		}
+	}
+	
+	
+	
+	for (char d_char : digits) {
+		string d = string(1, d_char);
+		map<string, string> potential = search(assign(values_copy, square, d));
+		
+		if (potential.size() != 0) {
+			return potential;
+		}
+	}
+	
+	
+	
+	return values; //failed to find solution
+	
+	
+	
+	
+	
+	//---------------------------CONSTRUCTION
+	/*
+	map<string, string> result;
+	
+	
+	cout << startingSquare << ": " << values.at(startingSquare) << endl;
+	
+	for (char d : values.at(startingSquare)) {
+		string digit = string(1, d);
+		map<string, string> potential = search(assign(values_copy, startingSquare, digit));
+		
+		cout << d << "-----" << endl;
+		//map<string, string> temp = assign(values_copy, startingSquare, digit);
+		//printValues(temp);
+		if (potential.size() != 0) {
+			result = potential;
+			return result;
+		}
+		else {
+			continue;
+		}
+	}
+	
+	
+	return result;
+	//return map<string, string>();
+	
+	
+	cout << "dude" << endl;
+	//vector<pair<string, string> > sorted_values = sortValues(values);
+	
+	
+	
+	//recursively try leftover possibilities
+	//starting with square with
+	//the least possible values
+	
+	map<string, string> temp_values = values;
+	map<string, string> values_copy = values;
+	
+	for (pair<string, string> sVal : sorted_map) {
+		
+		//values_copy.clear();
+		//values_copy = values;
+		cout << "in" << endl;
+		if (get<1>(sVal).size() > 1) {
+			cout << "deeper" << endl;
+			for (char d : get<1>(sVal)) {
+				//cout << "totes" << endl;
+				string digit = string(1, d);
+				
+				cout << "--------" << get<0>(sVal) << ": " << get<1>(sVal) << ": " << digit << "--------" << endl;
+				
+				
+				map<string, string> potential = search(assign(values_copy, get<0>(sVal), digit));
+				cout << "size: " << potential.size() << endl;
+				
+		
+				if (potential.size() == 0) {
+					break;
+				}
+				
+					//printValues(temp_values);
+//					for (pair<string, string> z : potential) {
+//						cout << get<0>(z) << ": " << get<1>(z) << endl;
+//					}
+//					cout << endl;
+				
+				
+				
+				
+			}
+			continue;
+		}
+		//cout << "out" << endl;
+	}
+	
+	
+	return values_copy;
+	*/
+	//---------------------------CONSTRUCTION
+}
+
+
+
+//===------------------------------===//
+// Sort values
+//===------------------------------===//
+void sortValues(map<string, string> values) {
+	//Sort values according to its values' size
+	//vector<pair<string, string> > sorted_values;
+	
+	CompareValuesSize compare;
+	
+	for (pair<string, string> val : values) {
+		sorted_map.push_back(val);
+	}
+	sort(sorted_map.begin(), sorted_map.end(), compare);
+	
+	
+	for (pair<string, string> p : sorted_map) {
+		if (get<1>(p).size() > 1) {
+			startingSquare = get<0>(p);
+			break;
+		}
+	}
+}
 
 
 
@@ -77,12 +276,8 @@ void printValues(map<string, string> values) {
 			for (int w = 0; w < width * 3; ++w) { cout << "-"; }
 			cout << endl;
 		}
-		else if (c % 9 == 0) {
-			cout << endl;
-		}
-		else if (c % 3 == 0) {
-			cout << "|";
-		}
+		else if (c % 9 == 0) { cout << endl; }
+		else if (c % 3 == 0) { cout << "|"; }
 		
 		++c;
 	}
@@ -105,7 +300,7 @@ map<string, string> parseGridToValues(vector<string> gr) {
 	
 	
 	for (pair<string, string> p : gridValues(gr)) {
-		if (find(digits.begin(), digits.end(), get<1>(p)) != digits.end()) {
+		if (find(digits.begin(), digits.end(), get<1>(p)) != digits.end() && path) {
 			assign(values, get<0>(p), get<1>(p));
 		}
 	}
@@ -142,7 +337,9 @@ map<string, string> assign(map<string, string> &values, string s, string d) {
 	
 	for (int i = 0; i < other_values.size(); ++i) {
 		string val(1, other_values.at(i));
-		eliminate(values, s, val);
+		if (path) {
+			eliminate(values, s, val);
+		}
 	}
 
 	return values;
@@ -167,8 +364,8 @@ map<string, string> eliminate(map<string, string> &values, string s, string d) {
 	val->erase(remove(val->begin(), val->end(), d[0]), val->end());
 	
 	if (val->size() == 0) {
-		cout << "(!) A Sudoku square cannot be assigned any value" << endl;
-		exit(1); //error, we removed the last node
+		path = false;
+		return map<string, string>(); //error, we removed the last node
 	}
 	else if (val->size() == 1) {
 		string* d1 = val;
@@ -177,8 +374,9 @@ map<string, string> eliminate(map<string, string> &values, string s, string d) {
 		//if s has 1 mapped value (d1),
 		//eliminate d1 from its peers
 		for (string p : peers.at(s)) {
-			
-			eliminate(values, p, *d1);
+			if (path) {
+				eliminate(values, p, *d1);
+			}
 		}
 	}
 	
@@ -197,11 +395,13 @@ map<string, string> eliminate(map<string, string> &values, string s, string d) {
 			}
 		}
 		if (places_of_d.size() == 0) {
-			cout << "(!) Cannot assign computed value to Sudoku" << endl;
-			exit(1); //error, no square can hold d
+			path = false;
+			return map<string, string>(); //error, no square can hold d
 		}
 		else if (places_of_d.size() == 1) {
-			assign(values, places_of_d.at(0), d); //assign d to the only square left that can hold d
+			if (path) {
+				assign(values, places_of_d.at(0), d); //assign d to the only square left that can hold d
+			}
 		}
 	}
 	
@@ -272,6 +472,8 @@ void initGlobalVar() {
 		pair<string, vector<string> > peer(sq, corresponding_peers);
 		peers.insert(peer);
 	}
+	
+	path = true;
 }
 
 
@@ -343,9 +545,11 @@ int main(int argc, const char * argv[]) {
 	initGlobalVar();
 	
 	printGrid();
-	printValues(parseGridToValues(grid));
-
-	
+	//printValues(parseGridToValues(grid));
+	map<string, string> parse_grid_solution = parseGridToValues(grid);
+	//sortValues(parse_grid_solution);
+	//printValues(search(parse_grid_solution));
+	search(parse_grid_solution);
 	
 	
 	
