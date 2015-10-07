@@ -27,8 +27,14 @@ vector<vector<string> > unitlist;				//27 possible units (9 columns + 9 rows + 9
 map<string, vector<vector<string> > > units;	//map each square to its 3 corresponding units
 map<string, vector<string> > peers;				//map each square to its 20 corresponding peers
 bool path;
-vector<pair<string, string> > sorted_map;
-string startingSquare;
+vector<pair<string, string> > sorted_map; //rid
+string startingSquare; //rid
+
+string square;
+string prev_square = "";
+map<string, vector<string> > eliminations;
+
+
 
 //===------------------------------===//
 // Function headers
@@ -92,32 +98,51 @@ map<string, string> search(map<string, string> values) {
 	
 	map<string, string> values_copy = values;
 	
+
 	
 	//start at square with least possibilities
 	vector<pair<string, string> > sorted_values;
 	CompareValuesSize compare;
-	for (pair<string, string> val : values) {
+	for (pair<string, string> val : values_copy) {
 		sorted_values.push_back(val);
 	}
 	sort(sorted_values.begin(), sorted_values.end(), compare);
 	
 	
 	
-	//try all digits of that square
-	string square;
 	string digits;
 	for (pair<string, string> sVal: sorted_values) {
 		if (get<1>(sVal).size() > 1) {
-			square = get<0>(sVal);
-			digits = get<1>(sVal);
-			break;
+			if( prev_square == "") {
+				prev_square = get<0>(sVal);
+				square = get<0>(sVal);
+				digits = get<1>(sVal);
+				break;
+			}
+//			else if (eliminations.size() == 0 ||
+//					 find(eliminations.at(square).begin(), eliminations.at(square).end(), get<0>(sVal)) == eliminations.at(square).end()) {
+//				prev_square = square;
+//				square = get<0>(sVal);
+//				digits = get<1>(sVal);
+//				break;
+//			}
+			else {
+				prev_square = square;
+				square = get<0>(sVal);
+				digits = get<1>(sVal);
+				break;
+			}
 		}
+		//find get<0>sVal in 2nd tuple
+
 	}
 	
 	
 	
+	//try all digits of that square
 	for (char d_char : digits) {
 		string d = string(1, d_char);
+		//cout << square << ": " << digits << ": " << d << endl;
 		map<string, string> potential = search(assign(values_copy, square, d));
 		
 		if (potential.size() != 0) {
@@ -125,95 +150,36 @@ map<string, string> search(map<string, string> values) {
 		}
 	}
 	
+	square = prev_square;
 	
 	
-	return values; //failed to find solution
-	
-	
-	
-	
-	
-	//---------------------------CONSTRUCTION
-	/*
-	map<string, string> result;
-	
-	
-	cout << startingSquare << ": " << values.at(startingSquare) << endl;
-	
-	for (char d : values.at(startingSquare)) {
-		string digit = string(1, d);
-		map<string, string> potential = search(assign(values_copy, startingSquare, digit));
-		
-		cout << d << "-----" << endl;
-		//map<string, string> temp = assign(values_copy, startingSquare, digit);
-		//printValues(temp);
-		if (potential.size() != 0) {
-			result = potential;
-			return result;
-		}
-		else {
-			continue;
-		}
-	}
-	
-	
-	return result;
-	//return map<string, string>();
-	
-	
-	cout << "dude" << endl;
-	//vector<pair<string, string> > sorted_values = sortValues(values);
+//	cout << "**" << prev_square << ": " << square << endl;
+//	
+//	//push false combinations to map
+//	if (eliminations.size() == 0 || eliminations.find(prev_square) == eliminations.end()) {
+//		vector<string> elim;
+//		elim.push_back(square);
+//		eliminations.insert(pair<string, vector<string> >(prev_square, elim));
+//	}
+//	else {
+//		eliminations.at(prev_square).push_back(square);
+//	}
+
 	
 	
 	
-	//recursively try leftover possibilities
-	//starting with square with
-	//the least possible values
-	
-	map<string, string> temp_values = values;
-	map<string, string> values_copy = values;
-	
-	for (pair<string, string> sVal : sorted_map) {
-		
-		//values_copy.clear();
-		//values_copy = values;
-		cout << "in" << endl;
-		if (get<1>(sVal).size() > 1) {
-			cout << "deeper" << endl;
-			for (char d : get<1>(sVal)) {
-				//cout << "totes" << endl;
-				string digit = string(1, d);
-				
-				cout << "--------" << get<0>(sVal) << ": " << get<1>(sVal) << ": " << digit << "--------" << endl;
-				
-				
-				map<string, string> potential = search(assign(values_copy, get<0>(sVal), digit));
-				cout << "size: " << potential.size() << endl;
-				
-		
-				if (potential.size() == 0) {
-					break;
-				}
-				
-					//printValues(temp_values);
-//					for (pair<string, string> z : potential) {
-//						cout << get<0>(z) << ": " << get<1>(z) << endl;
-//					}
-//					cout << endl;
-				
-				
-				
-				
-			}
-			continue;
-		}
-		//cout << "out" << endl;
-	}
+//	if (eliminations.size() > 0) {
+//		for (pair<string, vector<string> > e : eliminations) {
+//			cout << get<0>(e) << ": ";
+//			for (string s : get<1>(e)) {
+//				cout << s << ", " << endl;
+//			}
+//		}
+//	}
 	
 	
-	return values_copy;
-	*/
-	//---------------------------CONSTRUCTION
+	path = false;
+	return values;
 }
 
 
@@ -548,8 +514,8 @@ int main(int argc, const char * argv[]) {
 	//printValues(parseGridToValues(grid));
 	map<string, string> parse_grid_solution = parseGridToValues(grid);
 	//sortValues(parse_grid_solution);
-	//printValues(search(parse_grid_solution));
-	search(parse_grid_solution);
+	printValues(search(parse_grid_solution));
+	//search(parse_grid_solution);
 	
 	
 	
