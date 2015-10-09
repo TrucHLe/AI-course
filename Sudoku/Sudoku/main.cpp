@@ -12,6 +12,7 @@
 #include <string.h>	//strcat
 #include <algorithm>//remove char from string
 #include <stack>	//stack for DFS
+#include <time.h>	//clock_t
 #include "FileManager.h"
 
 using namespace std;
@@ -112,7 +113,7 @@ pair<bool, map<string, string> > DFS(pair<bool, map<string, string> > values) {
 			}
 			if (solved) {
 				cout << endl;
-				cout << "---------- SOLVED ----------" << endl;
+				cout << "------ SOLVED ------" << endl;
 				return *current_map;
 			}
 			
@@ -471,6 +472,8 @@ vector<string> cross(vector<string> A, string b) {
 //===------------------------------===//
 void printGrid() {
 	cout << endl;
+	cout << "----- ORIGINAL -----" << endl;
+	cout << endl;
 	for (int g = 1; g < grid.size() + 1; ++g) {
 		cout << grid.at(g - 1) << " ";
 		
@@ -485,6 +488,8 @@ void printGrid() {
 			cout << "|";
 		}
 	}
+	cout << endl;
+	cout << "(searching...)" << endl;
 }
 
 
@@ -496,13 +501,18 @@ void printGrid() {
 int main(int argc, const char * argv[]) {
 	
 	FileManager file = FileManager();
+	
+	clock_t time = clock();
 	grid = file.grid;
 	initGlobalVar();
 	
 	printGrid();
 	printValues(solve(grid));
 	
-	
+	time = clock() - time;
+	cout << endl;
+	cout << "(" << ( double ) time / CLOCKS_PER_SEC << " seconds)"<< endl;
+	cout << endl;
 	
 	return 0;
 }
