@@ -11,6 +11,7 @@
 #include <map>		//map
 #include <string.h>	//strcat
 #include <algorithm>//remove char from string
+#include <stack>	//stack for DFS
 #include "FileManager.h"
 
 using namespace std;
@@ -26,7 +27,6 @@ vector<string> squares;							//all 1x1 Sudoku's squares
 vector<vector<string> > unitlist;				//27 possible units (9 columns + 9 rows + 9 3x3 squares)
 map<string, vector<vector<string> > > units;	//map each square to its 3 corresponding units
 map<string, vector<string> > peers;				//map each square to its 20 corresponding peers
-bool path;
 
 
 
@@ -38,23 +38,27 @@ vector<string> cross(vector<string> A, vector<string> B);
 vector<string> cross(string a, vector<string> B);
 vector<string> cross(vector<string> A, string b);
 void initGlobalVar();
-map<string, string> eliminate(map<string, string> &values, string square, string digit);
-map<string, string> assign(map<string, string> &values, string square, string digit);
 map<string, string> gridValues(vector<string> gr);
-map<string, string> parseGridToValues(vector<string> gr);
-void printValues(map<string, string> values);
+
+void printValues(pair<bool, map<string, string> > values);
 
 
-map<string, string> search(map<string, string> values);
-map<string, string> solve();
+
+//each returned map has a bool goes with it so that DFS search knows which map is worth searching deeper
+pair<bool, map<string, string> > parseGridToValues(vector<string> gr);
+pair<bool, map<string, string> > solve(vector<int> grid);
+
+pair<bool, map<string, string> > eliminate(pair<bool, map<string, string> >& values, string square, string digit);
+pair<bool, map<string, string> > assign(pair<bool, map<string, string> >& values, string square, string digit);
+pair<bool, map<string, string> > DFS(pair<bool, map<string, string> > values); //depth first search
 
 
 
 //===------------------------------===//
 // Solve Sudoku
 //===------------------------------===//
-map<string, string> solve() {
-	return search(parseGridToValues(grid));
+pair<bool, map<string, string> > solve(vector<string> grid) {
+	return DFS(parseGridToValues(grid));
 }
 
 
@@ -71,118 +75,158 @@ struct CompareValuesSize {
 };
 
 
-map<string, string> search(map<string, string> values) {
+pair<bool, map<string, string> > DFS(pair<bool, map<string, string> > values) {
 	
-	//failed parse grid
-	if (!path) {
-		return map<string, string>();
-	}
 	
-
-	//solved in parse grid
+	//Return values if solved in constraint propagation
 	bool solved = true;
-	for (pair<string, string> val : values) {
+	for (pair<string, string> val : get<1>(values)) {
 		if (get<1>(val).size() > 1) {
 			solved = false;
+			break;
 		}
 	}
 	if (solved) { return values; }
 	
 	
 	
-	map<string, string> values_copy = values;
-	
-
-	
-	//start at square with least possibilities
-	vector<pair<string, string> > sorted_values;
-	CompareValuesSize compare;
-	for (pair<string, string> val : values_copy) {
-		sorted_values.push_back(val);
-	}
-	sort(sorted_values.begin(), sorted_values.end(), compare);
-	
-	
-	string square;
-	string digits;
-	for (pair<string, string> sVal: sorted_values) {
-		if (get<1>(sVal).size() > 1) {
-				square = get<0>(sVal);
-				digits = get<1>(sVal);
-				break;
-		}
-
-	}
-	
-	
-	
-	//try all digits of that square
-	for (char d_char : digits) {
-		string d = string(1, d_char);
-		cout << square << ": " << digits << ": " << d << endl;
-		map<string, string> potential = search(assign(values_copy, square, d));
+	//DFS search if values is an unsolved valid map
+	if (get<0>(values)) {
 		
-		if (potential.size() != 0) {
-			return potential;
+		pair<bool, map<string, string> >* current_map;
+		pair<bool, map<string, string> > val = values;
+		stack<pair<bool, map<string, string> > > DFS_stack;
+		
+		DFS_stack.push(val);
+		current_map = &DFS_stack.top();
+		
+		
+		while (!DFS_stack.empty()) {
+			
+			bool solved = true;
+			for (pair<string, string> v : get<1>(*current_map)) {
+				if (get<1>(v).size() > 1) {
+					solved = false;
+					break;
+				}
+			}
+			if (solved) {
+				cout << endl;
+				cout << "---------- SOLVED ----------" << endl;
+				return *current_map;
+			}
+			
+			
+			map<string, string> values_copy = get<1>(*current_map);
+			DFS_stack.pop();
+			
+			//find a square with the least possibilities
+			vector<pair<string, string> > sorted_values;
+			CompareValuesSize compare;
+			for (pair<string, string> val : values_copy) {
+				sorted_values.push_back(val);
+			}
+			sort(sorted_values.begin(), sorted_values.end(), compare);
+			
+			
+			//get this square and its possibilities
+			string square;
+			string possible_digits;
+			for (pair<string, string> sVal: sorted_values) {
+				if (get<1>(sVal).size() > 1) {
+					square = get<0>(sVal);
+					possible_digits = get<1>(sVal);
+					break;
+				}
+			}
+			
+			
+			
+			
+			for (char digit_char : possible_digits) {
+				string digit = string(1, digit_char);
+				pair<bool, map<string, string> > potential_val(true, values_copy);
+				
+				//cout << square << ": " << possible_digits << ": " << digit << endl;
+				
+				assign(potential_val, square, digit);
+				
+				if (get<0>(potential_val)) {
+					DFS_stack.push(potential_val);
+				}
+				//printValues(DFS_stack.top());
+			}
+			
+			current_map = &DFS_stack.top();
+			
+			
 		}
+		
+		
 	}
-	
 	
 	return values;
 }
 
 
 
-
 //===------------------------------===//
 // Print values
 //===------------------------------===//
-void printValues(map<string, string> values) {
+void printValues(pair<bool, map<string, string> > values) {
 	
-	int width = 0;
-	for (string sq : squares) {
-		if (values.at(sq).size() > width) {
-			width = (int) values.at(sq).size();
+	if (get<0>(values)) {
+		map<string, string> val = get<1>(values);
+		
+		int width = 0;
+		for (string sq : squares) {
+			if (val.at(sq).size() > width) {
+				width = (int) val.at(sq).size();
+			}
+		}
+		++width;
+		
+		
+		map<string, string>::iterator it;
+		int c = 1;
+		cout << endl;
+		for (it = val.begin(); it != val.end(); ++it) {
+			cout << it->second;
+			
+			if ((it->second).size() < width) {
+				for (int w = 0; w < width - (it->second).size(); ++w) { cout << " "; }
+			}
+			
+			if (c % 27 == 0 && c % 81 != 0) {
+				cout << endl;
+				for (int w = 0; w < width * 3; ++w) { cout << "-"; }
+				cout << "+";
+				for (int w = 0; w < width * 3; ++w) { cout << "-"; }
+				cout << "+";
+				for (int w = 0; w < width * 3; ++w) { cout << "-"; }
+				cout << endl;
+			}
+			else if (c % 9 == 0) { cout << endl; }
+			else if (c % 3 == 0) { cout << "|"; }
+			
+			++c;
 		}
 	}
-	++width;
-	
-	
-	map<string, string>::iterator it;
-	int c = 1;
-	cout << endl;
-	for (it = values.begin(); it != values.end(); ++it) {
-		cout << it->second;
-		
-		if ((it->second).size() < width) {
-			for (int w = 0; w < width - (it->second).size(); ++w) { cout << " "; }
-		}
-		
-		if (c % 27 == 0 && c % 81 != 0) {
-			cout << endl;
-			for (int w = 0; w < width * 3; ++w) { cout << "-"; }
-			cout << "+";
-			for (int w = 0; w < width * 3; ++w) { cout << "-"; }
-			cout << "+";
-			for (int w = 0; w < width * 3; ++w) { cout << "-"; }
-			cout << endl;
-		}
-		else if (c % 9 == 0) { cout << endl; }
-		else if (c % 3 == 0) { cout << "|"; }
-		
-		++c;
+	else {
+		cout << "(!) Can't solve Sudoku" << endl;
+		exit(1);
 	}
 }
 
 
 
 //===------------------------------===//
-// Parse grid into map of each square
-// and its possible values
+// Parse grid into a map that maps each
+// square to its possible values
 //===------------------------------===//
-map<string, string> parseGridToValues(vector<string> gr) {
-
-	map<string, string> values;
+pair<bool, map<string, string> > parseGridToValues(vector<string> gr) {
+	
+	map<string, string> values; //map of each square and its possible values
 	
 	//assign values 1-9 to every square
 	for (string sq : squares) {
@@ -190,19 +234,31 @@ map<string, string> parseGridToValues(vector<string> gr) {
 	}
 	
 	
+	pair<bool ,map<string, string> > val(true, values);
 	for (pair<string, string> p : gridValues(gr)) {
-		if (find(digits.begin(), digits.end(), get<1>(p)) != digits.end() && path) {
-			assign(values, get<0>(p), get<1>(p));
+		
+		//if a square's value isn't 0, assign that value to that square
+		if (find(digits.begin(), digits.end(), get<1>(p)) != digits.end()) {
+			
+			if (get<0>(val)) {
+				assign(val, get<0>(p), get<1>(p));
+			}
+			else {
+				//cout << "(!) PARSE GRID TO VALUES ERROR" << endl;
+				get<0>(val) = false;
+				return val;
+			}
 		}
 	}
 	
-	return values;
+	return val;
 }
 
 
 
 //===------------------------------===//
 // Map each square to its original value
+// taken from the initial puzzle
 //===------------------------------===//
 map<string, string> gridValues(vector<string> gr) {
 	map<string, string> grid_values;
@@ -220,19 +276,24 @@ map<string, string> gridValues(vector<string> gr) {
 // from possible values of square s.
 // Return fasle if found contradiction
 //===------------------------------===//
-map<string, string> assign(map<string, string> &values, string s, string d) {
+pair<bool, map<string, string> > assign(pair<bool, map<string, string> >& values, string square, string digit) {
 	
-	string other_values = values.at(s);
-	other_values.erase(remove(other_values.begin(), other_values.end(), d[0]), other_values.end());
+	//Don't reference other_values from values because we want to maintain other_values
+	string other_values = get<1>(values).at(square);
+	other_values.erase(remove(other_values.begin(), other_values.end(), digit[0]), other_values.end());
+	
 	
 	
 	for (int i = 0; i < other_values.size(); ++i) {
 		string val(1, other_values.at(i));
-		if (path) {
-			eliminate(values, s, val);
+		if(get<0>(values)) {
+			eliminate(values, square, val);
+		}
+		else {
+			return values;
 		}
 	}
-
+	
 	return values;
 }
 
@@ -242,56 +303,60 @@ map<string, string> assign(map<string, string> &values, string s, string d) {
 // Eliminate a digit from a square's
 // string of possible values
 //===------------------------------===//
-map<string, string> eliminate(map<string, string> &values, string s, string d) {
-	string* val = &values.at(s);
+pair<bool, map<string, string> > eliminate(pair<bool, map<string, string> >& values, string square, string digit) {
+	string* val = &get<1>(values).at(square); //val is a reference to the values mapped to square
 	
 	
-	if (val->find(d) == string::npos) { //d is already eliminated
+	if (val->find(digit) == string::npos) { //digit is already eliminated
 		return values;
 	}
-
 	
+	val->erase(remove(val->begin(), val->end(), digit[0]), val->end()); //eliminate digit
 	
-	val->erase(remove(val->begin(), val->end(), d[0]), val->end());
 	
 	if (val->size() == 0) {
-		path = false;
-		return map<string, string>(); //error, we removed the last node
+		get<0>(values) = false; //(!) Error: removed last node
+		return values;
 	}
-	else if (val->size() == 1) {
-		string* d1 = val;
+	else if (val->size() == 1) { //there's 1 possibility left
+		string* assigned_digit = val;
 		
-		//Check value of s against its PEERS,
-		//if s has 1 mapped value (d1),
-		//eliminate d1 from its peers
-		for (string p : peers.at(s)) {
-			if (path) {
-				eliminate(values, p, *d1);
+		//Check value of square against its PEERS,
+		//if square has 1 mapped value (assigned_digit),
+		//eliminate assigned_digit from square's peers
+		for (string peer : peers.at(square)) {
+			if (get<0>(values)) {
+				eliminate(values, peer, *assigned_digit);
+			}
+			else {
+				return values;
 			}
 		}
 	}
 	
-		
-	//Check the above eliminated value d
-	//against UNITS of s, if there's a unit
-	//that was reduced to 1 possibility, put d there
-	for (vector<string> vStr : units.at(s)) {
+	
+	//Check digit against UNITS of square, if there's a unit
+	//that was reduced to 1 possibility, put digit there
+	for (vector<string> vStr : units.at(square)) {
 		vector<string> places_of_d;
 		
 		
-		//find squares that have d as a possibility
+		//find squares that have digit as a possibility
 		for (string str : vStr) {
-			if (values.at(str).find(d) != string::npos) {
+			if (get<1>(values).at(str).find(digit) != string::npos) {
 				places_of_d.push_back(str);
 			}
 		}
 		if (places_of_d.size() == 0) {
-			path = false;
-			return map<string, string>(); //error, no square can hold d
+			get<0>(values) = false; //(!) Error: no place for d
+			return values;
 		}
 		else if (places_of_d.size() == 1) {
-			if (path) {
-				assign(values, places_of_d.at(0), d); //assign d to the only square left that can hold d
+			if (get<0>(values)) {
+				assign(values, places_of_d.at(0), digit); //assign digit to the only leftover square that can hold digit
+			}
+			else {
+				return values;
 			}
 		}
 	}
@@ -363,14 +428,13 @@ void initGlobalVar() {
 		pair<string, vector<string> > peer(sq, corresponding_peers);
 		peers.insert(peer);
 	}
-	
-	path = true;
 }
 
 
 
 //===------------------------------===//
-// Concatenate each of 2 vectors' elements
+// Concatenate each of the 2 vector<string>'s
+// strings to generate Sudoku board
 //===------------------------------===//
 vector<string> cross(vector<string> A, vector<string> B) {
 	vector<string> crossed;
@@ -427,25 +491,19 @@ void printGrid() {
 
 //===------------------------------===//
 // Main
-// /Users/Bamboo/Developer/AI-course/Sudoku/Sudoku/easy.txt
+// /Users/Bamboo/Desktop/Sudo/Sudo/test2.txt
 //===------------------------------===//
 int main(int argc, const char * argv[]) {
-
+	
 	FileManager file = FileManager();
 	grid = file.grid;
 	initGlobalVar();
 	
 	printGrid();
-	//printValues(parseGridToValues(grid));
-	map<string, string> parse_grid_solution = parseGridToValues(grid);
-	//sortValues(parse_grid_solution);
-	printValues(search(parse_grid_solution));
-	//search(parse_grid_solution);
+	printValues(solve(grid));
 	
 	
 	
-
-	
-    return 0;
+	return 0;
 }
 
