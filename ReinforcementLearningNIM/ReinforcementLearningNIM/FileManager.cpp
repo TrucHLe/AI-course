@@ -130,7 +130,7 @@ int FileManager::getTerminalState()
 	do
 	{
 		current_char = getCurrentChar();
-		current_lexeme = current_lexeme + current_char;
+		current_lexeme += current_char;
 		
 		
 		// Erase all whitespaces if the whitespace

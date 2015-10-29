@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4D57FD761BE14EE7005EF65E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D57FD751BE14EE7005EF65E /* main.cpp */; };
 		4D57FD7F1BE15BBA005EF65E /* FileManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D57FD7D1BE15BBA005EF65E /* FileManager.cpp */; };
+		4D57FD851BE1B610005EF65E /* Move.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D57FD841BE1B610005EF65E /* Move.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,8 @@
 		4D57FD7E1BE15BBA005EF65E /* FileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileManager.h; sourceTree = "<group>"; };
 		4D57FD801BE165D4005EF65E /* StatesTransitionTable.tsv */ = {isa = PBXFileReference; lastKnownFileType = text; path = StatesTransitionTable.tsv; sourceTree = "<group>"; };
 		4D57FD821BE16BC0005EF65E /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		4D57FD831BE1B111005EF65E /* Move.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Move.h; sourceTree = "<group>"; };
+		4D57FD841BE1B610005EF65E /* Move.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Move.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,9 +69,11 @@
 				4D57FD751BE14EE7005EF65E /* main.cpp */,
 				4D57FD7D1BE15BBA005EF65E /* FileManager.cpp */,
 				4D57FD7E1BE15BBA005EF65E /* FileManager.h */,
+				4D57FD841BE1B610005EF65E /* Move.cpp */,
+				4D57FD831BE1B111005EF65E /* Move.h */,
+				4D57FD821BE16BC0005EF65E /* Constants.h */,
 				4D57FD801BE165D4005EF65E /* StatesTransitionTable.tsv */,
 				4D57FD7C1BE152D1005EF65E /* learned-moves.txt */,
-				4D57FD821BE16BC0005EF65E /* Constants.h */,
 			);
 			path = ReinforcementLearningNIM;
 			sourceTree = "<group>";
@@ -129,6 +134,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D57FD851BE1B610005EF65E /* Move.cpp in Sources */,
 				4D57FD761BE14EE7005EF65E /* main.cpp in Sources */,
 				4D57FD7F1BE15BBA005EF65E /* FileManager.cpp in Sources */,
 			);

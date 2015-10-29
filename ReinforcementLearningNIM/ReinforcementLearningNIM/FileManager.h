@@ -42,7 +42,7 @@ public:
 	int next();
 	
 	void getLearnedMoves();
-	void updateLearnedMoves();
+	void updateLearnedMoves(array<array<int, 10>, 3> updatedMoves); //finish later
 	
 };
 
