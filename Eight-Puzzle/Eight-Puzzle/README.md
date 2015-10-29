@@ -1,5 +1,5 @@
 # Eight-Puzzle Solver
-Solve any eight-puzzle problem using either an uninformed search algorithm (Breadth-First Search) or an informed search algorithm (A* Search)
+Solve any eight-puzzle problem using either an uninformed search algorithm (Breadth-First Search) or an informed search algorithm (A* Search).
 
 ### Compile
 Please compile using C++ 11
