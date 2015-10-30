@@ -49,7 +49,7 @@ int computeMove( int available_sticks, array<int, 3> valid_moves )
     //
     // - Divide the number of sticks available by the
     //      sum of the maximum sticks that a player
-    //      can take (which is 3 + 1 = 4 in this case).
+    //      can take and 1 (which is 3 + 1 = 4 in this case).
     // - The remainder is the number of sticks that
     //      the first player (which is the computer)
     //      should take.

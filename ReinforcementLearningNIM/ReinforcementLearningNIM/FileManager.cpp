@@ -29,14 +29,14 @@ FileManager::FileManager()
 ifstream FileManager::getFile()
 {
 	ifstream file;
-	//file.open("learned-moves.txt");
-	file.open("/Users/Bamboo/Developer/AI-course/ReinforcementLearningNIM/ReinforcementLearningNIM/learned-moves.txt");
+	//file.open("inexperienced.txt");
+	file.open("learned.txt");
 	
 	while (file.fail())
 	{
 		string file_path;
 		
-		cout << "(!) Cannot find learned-moves.txt that contains the learned data." << endl;
+		cout << "(!) Cannot find learned.txt that contains the learned data." << endl;
 		cout << "Please enter a file to use as learned data: ";
 		cin >> file_path;
 		
@@ -188,7 +188,7 @@ int FileManager::next()
 			
 		case EOF_T:
 			current_lexeme = "";
-			return -987654321;
+			return numeric_limits<int>::max();
 			
 		case INT_ERROR:
 			cout << "(!) Expected an integer after '-'" << endl;
@@ -202,7 +202,7 @@ int FileManager::next()
 		// switch statement is exhaustive
 		// This line is just to make Xcode happy.
 		default:
-			return -987654321;
+			return numeric_limits<int>::max();
 	}
 }
 
@@ -232,7 +232,7 @@ void FileManager::getLearnedMoves()
 			++row;
 		}
 		
-	} while (counter < 30 || token % -987654321 != 0);
+	} while (counter < 30 || token % numeric_limits<int>::max() != 0);
 	
 	
 	if (counter < 30)
@@ -253,4 +253,30 @@ void FileManager::getLearnedMoves()
 	}
 	
 	
+}
+
+
+
+//===------------------------------===//
+// Write learned data
+//===------------------------------===//
+void FileManager::updateLearnedMoves(array<array<int, 10>, 3> updatedMoves)
+{
+	ofstream file;
+	file.open("learned.txt");
+	
+	for (int i = 0; i < 3; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			file << updatedMoves[i][j];
+			if (j != 9)
+				file << " ";
+		}
+		
+		if (i != 2)
+			file << "\n";
+	}
+	
+	file.close();
 }

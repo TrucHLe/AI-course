@@ -16,8 +16,6 @@
 using namespace std;
 
 
-void updateLearnedMoves();
-
 
 //===----------------------------------------------------------------------===//
 // Print instruction
@@ -67,13 +65,13 @@ void play()
 		// Check for a cell with highest reward
 		// and assign that cell's move + 1 (which is
 		// also its row index) to computer
-		int highest_reward = 2;
+		int row = 0;
 		for (int i = 0; i < 3; ++i)
-			if (learned_moves[i][sticks - 1] > learned_moves[highest_reward][sticks - 1])
-				highest_reward = i;
+			if (learned_moves[i][sticks - 1] > learned_moves[row][sticks - 1])
+				row = i;
 		
-		computer_take = highest_reward + 1;
-		Move move = Move(highest_reward, sticks - 1);
+		computer_take = row + 1;
+		Move move = Move(row, sticks - 1);
 		moves.push_back(move);
 		
 
@@ -85,7 +83,8 @@ void play()
 		if (sticks == 0)
 		{
 			for (Move m : moves)
-				learned_moves[m.row][m.column] += 1;
+				if (learned_moves[m.row][m.column] % numeric_limits<int>::max() != 0)
+					learned_moves[m.row][m.column] += 1;
 			
 			file.updateLearnedMoves(learned_moves);
 			
@@ -109,6 +108,7 @@ void play()
 		if (sticks == 0)
 		{
 			for (Move m : moves)
+				if (learned_moves[m.row][m.column] % numeric_limits<int>::min() != 0)
 				learned_moves[m.row][m.column] -= 1;
 			
 			file.updateLearnedMoves(learned_moves);

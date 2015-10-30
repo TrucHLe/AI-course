@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>4AE469C7-EF83-49BF-B937-766F4523FE7D</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>ReinforcementLearningNIM</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>0A10857D3B232AC9598B22FAC15F030A6C7039B8</key>
 		<string>https://github.com/TrucHLe/AI-course.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>ReinforcementLearningNIM/ReinforcementLearningNIM.xcodeproj/project.xcworkspace</string>
+	<string>ReinforcementLearningNIM/ReinforcementLearningNIM.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>0A10857D3B232AC9598B22FAC15F030A6C7039B8</key>

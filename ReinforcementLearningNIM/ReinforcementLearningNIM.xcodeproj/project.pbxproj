@@ -27,13 +27,14 @@
 /* Begin PBXFileReference section */
 		4D57FD721BE14EE7005EF65E /* ReinforcementLearningNIM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ReinforcementLearningNIM; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D57FD751BE14EE7005EF65E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		4D57FD7C1BE152D1005EF65E /* learned-moves.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "learned-moves.txt"; sourceTree = "<group>"; };
 		4D57FD7D1BE15BBA005EF65E /* FileManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileManager.cpp; sourceTree = "<group>"; };
 		4D57FD7E1BE15BBA005EF65E /* FileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileManager.h; sourceTree = "<group>"; };
 		4D57FD801BE165D4005EF65E /* StatesTransitionTable.tsv */ = {isa = PBXFileReference; lastKnownFileType = text; path = StatesTransitionTable.tsv; sourceTree = "<group>"; };
 		4D57FD821BE16BC0005EF65E /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		4D57FD831BE1B111005EF65E /* Move.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Move.h; sourceTree = "<group>"; };
 		4D57FD841BE1B610005EF65E /* Move.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Move.cpp; sourceTree = "<group>"; };
+		4DB568F71BE3E8100053F1B3 /* learned.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = learned.txt; sourceTree = "<group>"; };
+		4DB568F81BE3E85D0053F1B3 /* inexperienced.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = inexperienced.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,7 +74,8 @@
 				4D57FD831BE1B111005EF65E /* Move.h */,
 				4D57FD821BE16BC0005EF65E /* Constants.h */,
 				4D57FD801BE165D4005EF65E /* StatesTransitionTable.tsv */,
-				4D57FD7C1BE152D1005EF65E /* learned-moves.txt */,
+				4DB568F71BE3E8100053F1B3 /* learned.txt */,
+				4DB568F81BE3E85D0053F1B3 /* inexperienced.txt */,
 			);
 			path = ReinforcementLearningNIM;
 			sourceTree = "<group>";
@@ -253,6 +255,7 @@
 				4D57FD7B1BE14EE7005EF65E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
